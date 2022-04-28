@@ -1,0 +1,18 @@
+<h1>Changes for <%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>User</th>
+    <th>Tags</th>
+    <th>Source</th>
+  </tr>
+  <%= for change <- @changes do %>
+  <tr>
+    <td><%= change.inserted_at %></td>
+    <td><%= change.user.username %></td>
+    <td><%= change.tags |> Enum.sort() |> Enum.join(", ") %></td>
+    <td><%= change.source %></td>
+  </tr>
+  <% end %>
+</table>

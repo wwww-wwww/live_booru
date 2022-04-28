@@ -1,0 +1,13 @@
+<h1>Queue</h1>
+
+<table>
+<%= for {job, working} <- @queue do %>
+<tr>
+  <td><%= job.hash %></td>
+  <td><%= job.source %></td>
+  <td><%= job.user.name %></td>
+  <td><%= working %></td>
+  <td><%= job.inserted_at %></td>
+</tr>
+<% end %>
+</table>

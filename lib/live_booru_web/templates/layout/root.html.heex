@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <%= csrf_meta_tag() %>
+    <%= live_title_tag assigns[:page_title] || "LiveBooru", suffix: " · Phoenix Framework" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+  </head>
+  <body>
+    <header>
+      <section class="container">
+        <nav>
+          <div>
+            <span><%= live_redirect("Index", to: Routes.live_path(@conn, LiveBooruWeb.IndexLive)) %></span>
+            <span><%= live_redirect("Queue", to: Routes.live_path(@conn, LiveBooruWeb.QueueLive)) %></span>
+            <span><%= live_redirect("Tags", to: Routes.live_path(@conn, LiveBooruWeb.TagListLive)) %></span>
+            <%= render "_user_menu.html", assigns %>
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <span><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></span>
+            <% end %>
+          </div>
+        </nav>
+      </section>
+    </header>
+
+    <%= @inner_content %>
+  </body>
+</html>

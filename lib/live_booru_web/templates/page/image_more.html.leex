@@ -1,0 +1,32 @@
+<div class="middle">
+<div class="content">
+
+<%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+
+<table>
+  <tr><td>Image</td><td><%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></td></tr>
+  <tr><td>MD5</td><td><%= @image.hash %></td></tr>
+  <tr><td>Pixels MD5</td><td><%= @image.pixels_hash %></td></tr>
+  <tr><td>Thumbnail Pixels MD5</td><td><%= @image.thumb_hash %></td></tr>
+  <tr><td>Filesize (Bytes)</td><td><%= @image.filesize %></td></tr>
+  <tr><td>Encoder</td><td><%= @image.encoder_version %></td></tr>
+  <tr><td>Settings</td><td><%= @image.encoder_params %></td></tr>
+</table>
+
+<pre><code><%= @image.info %></code></pre>
+
+<h3>Uploads</h3>
+<ul>
+  <%= for upload <- @image.uploads do %>
+  <li>
+    <%= upload.hash %>
+    <ul>
+      <li>Date: <%= Timex.from_now(upload.inserted_at) %></li>
+      <li>Size: <%= Size.humanize!(upload.filesize) %></li>
+    </ul>
+  </li>
+  <% end %>
+</ul>
+
+</div>
+</div>

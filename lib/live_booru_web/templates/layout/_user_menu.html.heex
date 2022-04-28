@@ -1,0 +1,9 @@
+<%= if @current_user do %>
+  <span><%= @current_user.username %></span>
+  <span><%= live_redirect("Upload", to: Routes.live_path(@conn, LiveBooruWeb.UploadLive)) %></span>
+  <span><%= live_redirect("Settings", to: Routes.user_settings_path(@conn, :edit)) %></span>
+  <span><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></span>
+<% else %>
+  <span><%= live_redirect("Register", to: Routes.user_registration_path(@conn, :new)) %></span>
+  <span><%= live_redirect("Log in", to: Routes.user_session_path(@conn, :new)) %></span>
+<% end %>

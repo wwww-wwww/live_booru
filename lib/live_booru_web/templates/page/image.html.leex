@@ -1,0 +1,102 @@
+<div class="middle">
+
+<div class="sidebar">
+
+<% artists = @tags |> Enum.filter(& &1.type == :artist) %>
+<%= if length(artists) > 0 do %>
+<h3>Artists</h3>
+<ul class="taglist">
+  <%= for tag <- artists do %>
+  <li><%= tag_link(@socket, tag) %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<% copyrights = @tags |> Enum.filter(& &1.type == :copyright) %>
+<%= if length(copyrights) > 0 do %>
+<h3>Copyrights</h3>
+<ul class="taglist">
+  <%= for tag <- copyrights do %>
+  <li><%= tag_link(@socket, tag) %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<% characters = @tags |> Enum.filter(& &1.type == :character) %>
+<%= if length(characters) > 0 do %>
+<h3>Characters</h3>
+<ul class="taglist">
+  <%= for tag <- characters do %>
+  <li><%= tag_link(@socket, tag) %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<% meta = @tags |> Enum.filter(& &1.type == :meta or &1.type == :meta_system) %>
+<%= if length(meta) > 0 do %>
+<h3>Meta</h3>
+<ul class="taglist">
+  <%= for tag <- meta do %>
+  <li><%= tag_link(@socket, tag) %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<% tags = @tags |> Enum.filter(& &1.type == :general) %>
+<%= if length(tags) > 0 do %>
+<h3>Tags</h3>
+<ul class="taglist">
+  <%= for tag <- tags do %>
+  <li><%= tag_link(@socket, tag) %></li>
+  <% end %>
+</ul>
+<% end %>
+
+<h3>Information</h3>
+<ul>
+  <li>ID: <%= @image.id %></li>
+  <li>Date: <span><%= Timex.from_now(@image.inserted_at) %></span></li>
+  <li>Uploader: <%= @image.user.name %></li>
+  <li>Title: <%= @image.title %></li>
+  <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_patch("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
+  <li>Source: <%= @image.source %></li>
+  <li>Score: <%= @score %></li>
+  <li>Content Rating:
+  <%= cond do %>
+  <% Enum.any?(@image.tags, & &1.name == "NSFW") -> %>NSFW
+  <% Enum.any?(@image.tags, & &1.name == "Suggestive") -> %>Suggestive
+  <% true -> %>Safe
+  <% end %>
+  </li>
+</ul>
+
+<%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
+
+<%= if assigns[:current_user] do %>
+<%= live_patch("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
+<% end %>
+
+</div>
+
+<div class="content">
+
+<%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+
+<%= if !is_nil(@image.title) and String.length(@image.title) > 0 do %>
+<h2><%= @image.title %></h2>
+<% end %>
+
+<h3>Collections</h3>
+<div>
+  <%= for collection <- @image.collections do %>
+  <div class="collection">
+    <%= for image <- collection.images do %>
+    <%= image(@socket, assigns, image) %>
+    <% end %>
+  </div>
+  <% end %>
+</div>
+
+</div>
+
+</div>

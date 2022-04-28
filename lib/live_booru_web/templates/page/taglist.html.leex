@@ -1,0 +1,9 @@
+<table>
+<%= for tag <- @tags do %>
+<tr>
+  <td><%= tag.id %></td>
+  <td><%= live_patch(tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, tag.id)) %></td>
+  <td><%= tag.type %></td>
+</tr>
+<% end %>
+</table>

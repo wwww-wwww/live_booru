@@ -1,0 +1,28 @@
+<div class="middle">
+
+<div class="sidebar">
+
+<h3>Tags</h3>
+<ul class="taglist">
+  <%= for {tag, _} <- @tags do %>
+  <li><%= tag_link(@socket, tag, @search) %></li>
+  <% end %>
+</ul>
+
+</div>
+
+<div class="content">
+
+<div class="images">
+
+<%= for image <- @images do %>
+  <%= live_redirect(to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, image.id)) do %>
+    <%= img_tag(Routes.page_path(@socket, :thumb, Path.basename(image.thumb))) %>
+  <% end %>
+<% end %>
+
+</div>
+
+</div>
+
+</div>
