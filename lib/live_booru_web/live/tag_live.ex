@@ -136,6 +136,12 @@ defmodule LiveBooruWeb.TagLive do
 
     {:noreply, socket}
   end
+
+  def handle_event("cancel", _, socket) do
+    socket = assign(socket, :editing, false)
+
+    {:noreply, socket}
+  end
 end
 
 defmodule LiveBooruWeb.TagChangesLive do
