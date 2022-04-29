@@ -2,69 +2,19 @@
 
 <h1>Upload</h1>
 
-<div class="split">
+<form id="form_submit" phx-change="validate" phx-submit="submit">
+  <h3>File</h3>
+  <section phx-drop-target={@uploads.file.ref}>
+    <%= live_file_input @uploads.file %>
 
-  <div>
-    <form id="form_submit" phx-change="validate" phx-submit="submit">
-      <section phx-drop-target={@uploads.file.ref}>
-        <%= live_file_input @uploads.file %>
+    <%# Phoenix.LiveView.Helpers.upload_errors/1 returns a list of error atoms %>
+    <%= for err <- upload_errors(@uploads.file) do %>
+      <p class="alert alert-danger"><%= inspect(err) %></p>
+    <% end %>
 
-        <%# Phoenix.LiveView.Helpers.upload_errors/1 returns a list of error atoms %>
-        <%= for err <- upload_errors(@uploads.file) do %>
-          <p class="alert alert-danger"><%= inspect(err) %></p>
-        <% end %>
-      </section>
-
-      <h3>Title</h3>
-      <%= tag(:input, name: :title, value: @title) %>
-
-      <h3>Source</h3>
-      <%= tag(:input, name: :source, value: @source) %>
-
-      <h3>Rating</h3>
-      <div>
-        <label>
-          <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw") %>
-          NSFW
-        </label>
-
-        <label>
-          <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive") %>
-          Suggestive
-        </label>
-
-        <label>
-          <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe") %>
-          Safe
-        </label>
-      </div>
-
-    </form>
-
-    <h3>Tags</h3>
-    <div>
-      <%= for tag <- @tags do %>
-      <button value={tag} phx-click="tag_remove"><%= tag %></button>
-      <% end %>
-    </div>
-
-    <form phx-submit="tag_add" phx-change="tag_q" autocomplete="off">
-      <input list="results" type="text" name="value" />
-      <div>
-        <%= for tag <- @suggestions do %>
-        <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
-        <% end %>
-      </div>
-
-      <%= submit("Create Tag") %>
-    </form>
-
-    <%= submit("Submit", form: "form_submit") %>
-  </div>
-
-  <div>
-    <%# render each file entry %>
-    <%= for entry <- @uploads.file.entries do %>
+    <div class="entries">
+      <%# render each file entry %>
+      <%= for entry <- @uploads.file.entries do %>
       <article class="upload-entry">
 
         <figure>
@@ -73,21 +23,70 @@
           <figcaption><%= entry.client_name %></figcaption>
         </figure>
 
-        <%# entry.progress will update automatically for in-flight entries %>
-        <progress value={entry.progress} max="100"> <%= entry.progress %>% </progress>
+        <div>
+          <%# entry.progress will update automatically for in-flight entries %>
+          <progress value={entry.progress} max="100"> <%= entry.progress %>% </progress>
 
-        <%# a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 %>
-        <button phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">&times;</button>
-
+          <%# a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 %>
+          <button form="" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">&times;</button>
+        </div>
         <%# Phoenix.LiveView.Helpers.upload_errors/2 returns a list of error atoms %>
         <%= for err <- upload_errors(@uploads.file, entry) do %>
           <p class="alert alert-danger"><%= inspect(err) %></p>
         <% end %>
 
       </article>
+      <% end %>
+    </div>
+
+  </section>
+
+  <h3>Title</h3>
+  <%= tag(:input, name: :title, value: @title) %>
+
+  <h3>Source</h3>
+  <%= tag(:input, name: :source, value: @source) %>
+
+  <h3>Rating</h3>
+  <div>
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw") %>
+      NSFW
+    </label>
+
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive") %>
+      Suggestive
+    </label>
+
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe") %>
+      Safe
+    </label>
+  </div>
+
+</form>
+
+<h3>Tags</h3>
+<form phx-submit="tag_add" phx-change="tag_q" autocomplete="off">
+  <div class="tags">
+    <%= for tag <- @tags do %>
+    <button form="" value={tag} phx-click="tag_remove"><%= tag %></button>
     <% end %>
   </div>
 
-</div> <%# split %>
+  <div>
+    <%= tag(:input, name: :value) %>
+    <%= submit("Create Tag") %>
+  </div>
+
+  <div class="suggestions">
+    <%= for tag <- @suggestions do %>
+    <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
+    <% end %>
+  </div>
+</form>
+
+<div><%= submit("Submit", form: "form_submit") %></div>
 
 </div> <%# content %>

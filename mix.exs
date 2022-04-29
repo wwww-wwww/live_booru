@@ -51,7 +51,8 @@ defmodule LiveBooru.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:dart_sass, "~> 0.2", runtime: Mix.env() == :dev},
       {:size, "~> 0.1.0"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:earmark, "~> 1.4"}
     ]
   end
 

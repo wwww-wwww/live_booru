@@ -21,8 +21,8 @@ defmodule LiveBooruWeb.TagLive do
           socket
           |> assign(
             :can_edit,
-            LiveBooru.Accounts.admin?(socket.assigns.current_user) or
-              (not tag.locked and !is_nil(socket.assigns.current_user))
+            LiveBooru.Accounts.admin?(socket.assigns[:current_user]) or
+              (not tag.locked and !is_nil(socket.assigns[:current_user]))
           )
           |> assign(:editing, false)
           |> assign(:tag, tag)
@@ -98,7 +98,7 @@ defmodule LiveBooruWeb.TagLive do
   def handle_event("lock", _, socket) do
     socket =
       change_tag(socket, %{locked: true}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
+        LiveBooru.Accounts.admin?(socket.assigns[:current_user])
       end)
 
     {:noreply, socket}
@@ -107,7 +107,7 @@ defmodule LiveBooruWeb.TagLive do
   def handle_event("unlock", _, socket) do
     socket =
       change_tag(socket, %{locked: false}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
+        LiveBooru.Accounts.admin?(socket.assigns[:current_user])
       end)
 
     {:noreply, socket}
@@ -116,7 +116,7 @@ defmodule LiveBooruWeb.TagLive do
   def handle_event("save", %{"name" => name}, socket) do
     socket =
       change_tag(socket, %{name: name}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
+        LiveBooru.Accounts.admin?(socket.assigns[:current_user])
       end)
 
     {:noreply, socket}
@@ -125,7 +125,7 @@ defmodule LiveBooruWeb.TagLive do
   def handle_event("save", %{"type" => type}, socket) do
     socket =
       change_tag(socket, %{type: String.to_atom(type)}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
+        LiveBooru.Accounts.admin?(socket.assigns[:current_user])
       end)
 
     {:noreply, socket}

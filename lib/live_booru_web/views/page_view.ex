@@ -15,7 +15,11 @@ defmodule LiveBooruWeb.PageView do
     end
   end
 
+  def format_description(_socket, nil), do: ""
+
   def format_description(socket, text) do
+    {:ok, text, _} = Earmark.as_html(text)
+
     Regex.scan(~r/%Tag{([0-9]+?)}/, text || "")
     |> Enum.reduce(text, fn [full, id], acc ->
       Repo.get(Tag, id)

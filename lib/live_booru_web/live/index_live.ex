@@ -50,7 +50,8 @@ defmodule LiveBooruWeb.IndexLive do
               group_by: it.image_id
 
           from i in Image,
-            where: i.id not in subquery(query_exclude)
+            where: i.id not in subquery(query_exclude),
+            order_by: [desc: i.inserted_at]
 
         {inc, exc} ->
           query =
@@ -73,7 +74,8 @@ defmodule LiveBooruWeb.IndexLive do
           from i in Image,
             join: s in subquery(query),
             on: s.image_id == i.id,
-            where: i.id not in subquery(query_exclude)
+            where: i.id not in subquery(query_exclude),
+            order_by: [desc: i.inserted_at]
       end
 
     images =
