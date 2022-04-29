@@ -1,53 +1,52 @@
 <div class="middle">
 
 <div class="sidebar">
-
-<% artists = @tags |> Enum.filter(& &1.type == :artist) %>
+<% artists = @tags |> Enum.filter(& elem(&1, 0).type == :artist) %>
 <%= if length(artists) > 0 do %>
 <h3>Artists</h3>
 <ul class="taglist">
-  <%= for tag <- artists do %>
-  <li><%= tag_link(@socket, tag) %></li>
+  <%= for {tag, n} <- artists do %>
+  <li><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
 
-<% copyrights = @tags |> Enum.filter(& &1.type == :copyright) %>
+<% copyrights = @tags |> Enum.filter(& elem(&1, 0).type == :copyright) %>
 <%= if length(copyrights) > 0 do %>
 <h3>Copyrights</h3>
 <ul class="taglist">
-  <%= for tag <- copyrights do %>
-  <li><%= tag_link(@socket, tag) %></li>
+  <%= for {tag, n} <- copyrights do %>
+  <li><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
 
-<% characters = @tags |> Enum.filter(& &1.type == :character) %>
+<% characters = @tags |> Enum.filter(& elem(&1, 0).type == :character) %>
 <%= if length(characters) > 0 do %>
 <h3>Characters</h3>
 <ul class="taglist">
-  <%= for tag <- characters do %>
-  <li><%= tag_link(@socket, tag) %></li>
+  <%= for {tag, n} <- characters do %>
+  <li><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
 
-<% meta = @tags |> Enum.filter(& &1.type == :meta or &1.type == :meta_system) %>
+<% meta = @tags |> Enum.filter(& elem(&1, 0).type == :meta or elem(&1, 0).type == :meta_system) %>
 <%= if length(meta) > 0 do %>
 <h3>Meta</h3>
 <ul class="taglist">
-  <%= for tag <- meta do %>
-  <li><%= tag_link(@socket, tag) %></li>
+  <%= for {tag, n} <- meta do %>
+  <li><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
 
-<% tags = @tags |> Enum.filter(& &1.type == :general) %>
+<% tags = @tags |> Enum.filter(& elem(&1, 0).type == :general) %>
 <%= if length(tags) > 0 do %>
 <h3>Tags</h3>
 <ul class="taglist">
-  <%= for tag <- tags do %>
-  <li><%= tag_link(@socket, tag) %></li>
+  <%= for {tag, n} <- tags do %>
+  <li><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>

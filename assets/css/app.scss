@@ -34,6 +34,20 @@
   }
 }
 
+.search,
+.SearchLive {
+  padding: 0.5em;
+  form {
+    display: flex;
+    gap: 0.5em;
+
+    input {
+      flex: 1;
+      padding: 0.5em;
+    }
+  }
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -61,20 +75,6 @@ main {
 
   .content {
     flex: 1;
-  }
-}
-
-.SearchLive {
-  padding: 0.5em;
-
-  form {
-    display: flex;
-    gap: 0.5em;
-
-    input {
-      flex: 1;
-      padding: 0.5em;
-    }
   }
 }
 

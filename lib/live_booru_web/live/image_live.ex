@@ -21,10 +21,15 @@ defmodule LiveBooruWeb.ImageLive do
       image ->
         score = image.votes |> Enum.reduce(0, &if(&1.upvote, do: &2 + 1, else: &2 - 1))
 
+        tags =
+          image.tags
+          |> Repo.count_tags()
+          |> Enum.sort_by(&elem(&1, 0).name)
+
         socket =
           socket
           |> assign(:image, image)
-          |> assign(:tags, Enum.sort_by(image.tags, & &1.name))
+          |> assign(:tags, tags)
           |> assign(:score, score)
 
         {:ok, socket}

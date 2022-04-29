@@ -37,21 +37,29 @@ defmodule LiveBooruWeb.PageView do
     end)
   end
 
-  def tag_link(socket, tag, search) do
-    [a, b, c] = tag_link(socket, tag)
+  def quote_tag(%{name: name}) do
+    if String.contains?(name, " ") do
+      "\"#{name}\""
+    else
+      name
+    end
+  end
+
+  def tag_link(socket, tag, count, search) do
+    [a, b, c] = tag_link(socket, tag, count)
 
     [
       a,
       live_patch("+",
         to:
           Routes.live_path(socket, LiveBooruWeb.IndexLive,
-            q: String.trim("#{search} \"#{tag.name}\"")
+            q: String.trim("#{search} #{quote_tag(tag)}")
           )
       ),
       live_patch("-",
         to:
           Routes.live_path(socket, LiveBooruWeb.IndexLive,
-            q: String.trim("#{search} -\"#{tag.name}\"")
+            q: String.trim("#{search} -#{quote_tag(tag)}")
           )
       ),
       b,
@@ -59,10 +67,7 @@ defmodule LiveBooruWeb.PageView do
     ]
   end
 
-  def tag_link(socket, tag) do
-    query = from t in LiveBooru.ImagesTags, where: t.tag_id == ^tag.id
-    count = Repo.aggregate(query, :count)
-
+  def tag_link(socket, tag, count) do
     [
       live_patch("?", to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id)),
       live_patch(tag.name,
