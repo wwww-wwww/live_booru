@@ -1,7 +1,6 @@
-<div style="display: flex; flex-direction: column;">
 <h1>Register</h1>
 
-<.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)} style="display: flex; flex-direction: column;">
+<.form let={f} for={@changeset} action={Routes.user_registration_path(@socket, :create)}>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
@@ -22,6 +21,5 @@
 </.form>
 
 <p>
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
+  <%= live_patch "Log In", to: Routes.live_path(@socket, LiveBooruWeb.SignInLive) %>
 </p>
-</div>

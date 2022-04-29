@@ -1,3 +1,37 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:300,400,400i,500");
+@import url("https://fonts.googleapis.com/css?family=Google+Sans:400,500");
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  margin: 0 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+
+  > a {
+    padding: 0.5em 1em;
+    border-bottom: 2px solid transparent;
+  }
+
+  > a.selected {
+    border-bottom: 2px solid orange;
+  }
+}
+
 .IndexLive {
   .images {
     display: flex;
@@ -16,11 +50,6 @@
       }
     }
   }
-
-  main {
-    flex-direction: column;
-    gap: 0.5em;
-  }
 }
 
 .ImageLive {
@@ -37,6 +66,7 @@
 .search,
 .SearchLive {
   padding: 0.5em;
+
   form {
     display: flex;
     gap: 0.5em;
@@ -48,33 +78,67 @@
   }
 }
 
-main {
-  display: flex;
-  flex-direction: column;
+.UploadLive {
+  form {
+    section {
+      border: 1px solid black;
+      padding: 1em;
+    }
+  }
 
-  > .middle {
+  .split {
     display: flex;
   }
 
-  .sidebar {
-    flex-shrink: 0;
-    max-width: 18em;
-    overflow-x: hidden;
-    word-wrap: break-word;
-    padding: 0.5em;
+  .content {
+    padding: 1em;
+  }
+}
 
-    ul {
-      margin: 0;
-      padding: 0;
-    }
+main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 
-    li {
-      list-style-type: none;
+  > .middle {
+    display: flex;
+    flex: 1;
+
+    > .sidebar {
+      flex-shrink: 0;
+      width: 14em;
+      overflow-x: hidden;
+      word-wrap: break-word;
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      overflow-y: auto;
+
+      h3 {
+        margin: 0;
+      }
+
+      h3:not(:first-child) {
+        margin-top: 1em;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        list-style-type: none;
+      }
     }
   }
 
   .content {
     flex: 1;
+    padding: 1em;
+    overflow: auto;
+    box-shadow: inset 0 0 0.5em rgba(0, 0, 0, 0.2);
   }
 }
 

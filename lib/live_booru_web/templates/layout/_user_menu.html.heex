@@ -1,9 +1,8 @@
-<%= if @current_user do %>
-  <span><%= @current_user.username %></span>
-  <span><%= live_redirect("Upload", to: Routes.live_path(@conn, LiveBooruWeb.UploadLive)) %></span>
-  <span><%= live_redirect("Settings", to: Routes.user_settings_path(@conn, :edit)) %></span>
-  <span><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></span>
+<%= if assigns[:current_user] do %>
+  <%= nav_link (assigns[:socket] || assigns[:conn]), "Upload", LiveBooruWeb.UploadLive %>
+  <%= live_redirect("Settings", to: Routes.user_settings_path((assigns[:socket] || assigns[:conn]), :edit)) %>
+  <%= link "Log out", to: Routes.user_session_path((assigns[:socket] || assigns[:conn]), :delete), method: :delete %>
 <% else %>
-  <span><%= live_redirect("Register", to: Routes.user_registration_path(@conn, :new)) %></span>
-  <span><%= live_redirect("Log in", to: Routes.user_session_path(@conn, :new)) %></span>
+  <%= nav_link (assigns[:socket] || assigns[:conn]), "Register", LiveBooruWeb.SignUpLive %>
+  <%= nav_link (assigns[:socket] || assigns[:conn]), "Log in", LiveBooruWeb.SignInLive %>
 <% end %>

@@ -1,3 +1,17 @@
+<header>
+  <section class="container">
+    <nav>
+      <%= nav_link @socket, "Index", LiveBooruWeb.IndexLive %>
+      <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
+      <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
+      <%= render "_user_menu.html", assigns %>
+      <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+        <%= link "LiveDashboard", to: Routes.live_dashboard_path(@socket, :home) %>
+      <% end %>
+    </nav>
+  </section>
+</header>
+
 <main class="container">
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
