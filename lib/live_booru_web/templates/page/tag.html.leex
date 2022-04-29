@@ -1,28 +1,31 @@
 <% edit_level = if !is_nil(@current_user), do: @current_user.level, else: -1 %>
 <div class="content">
 
-<h1>
 <%= if @editing and edit_level >= 100 do %>
+<h3>Tag name</h3>
   <form phx-submit="save">
-    <%= tag(:input, name: :name, value: @tag.name) %>
-    <%= submit("Save") %>
+    <div>
+      <%= tag(:input, name: :name, value: @tag.name) %>
+      <%= submit("Save") %>
+    </div>
   </form>
 <% else %>
-  <%= @tag.name %>
+<h1><%= @tag.name %></h1>
 <% end %>
-</h1>
 
 <ul>
   <li>ID: <%= @tag.id %></li>
   <li>Type:
     <%= if @editing and edit_level >= 100 do %>
     <form phx-submit="save">
-      <select name="type">
-        <%= for type <- Ecto.Enum.values(LiveBooru.Tag, :type) do %>
-        <option value="<%= type %>" <%= if @tag.type == type do %>selected<% end %>><%= type %></option>
-        <% end %>
-      </select>
-      <%= submit("Save") %>
+      <div>
+        <select name="type">
+          <%= for type <- Ecto.Enum.values(LiveBooru.Tag, :type) do %>
+          <option value="<%= type %>" <%= if @tag.type == type do %>selected<% end %>><%= type %></option>
+          <% end %>
+        </select>
+        <%= submit("Save") %>
+      </div>
     </form>
     <% else %><%= @tag.type %><% end %>
   </li>
@@ -40,17 +43,15 @@
 </form>
 
 <%= if @tag.locked and edit_level >= 100 do %>
-<div><button phx-click="unlock">Unlock</button></div>
+<div><button type="submit" phx-click="unlock">Unlock</button></div>
 <% else %>
-<div><button phx-click="lock">Lock</button></div>
+<div><button type="submit" phx-click="lock">Lock</button></div>
 <% end %>
 
 <% else %>
 <p class="description"><%= raw format_description(@socket, @tag.description) %></p>
   <%= if @can_edit do %>
-  <div>
-    <button phx-click="edit">Edit</button>
-  </div>
+  <div><button type="submit" phx-click="edit">Edit</button></div>
   <% end %>
 <% end %>
 

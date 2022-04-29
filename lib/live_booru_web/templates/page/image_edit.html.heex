@@ -1,3 +1,5 @@
+<div class="content">
+
 <h1>Editing <%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
 
 <div>
@@ -27,27 +29,26 @@
   </div>
 </form>
 
-<h2>Tags</h2>
-<ul>
-  <%= for tag <- @tags do %>
-  <li>
-    <%= tag %>
-    <button phx-click="tag_remove" value={tag}>Remove</button>
-  </li>
-  <% end %>
-</ul>
-
+<h3>Tags</h3>
 <form phx-submit="tag_add" phx-change="tag_q" autocomplete="off">
-<input list="results" type="text" name="value" />
-<div>
-  <%= for tag <- @suggestions do %>
-  <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
-  <% end %>
-</div>
+  <div class="tags">
+    <%= for tag <- @tags do %>
+    <button form="" value={tag} phx-click="tag_remove"><%= tag %></button>
+    <% end %>
+  </div>
 
-<%= submit("Create Tag") %>
+  <div>
+    <%= tag(:input, name: :value) %>
+    <%= submit("Create Tag") %>
+  </div>
+
+  <div class="suggestions">
+    <%= for tag <- @suggestions do %>
+    <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
+    <% end %>
+  </div>
 </form>
 
-<div>
-  <button form="form_save">Save</button>
+<div><%= submit("Save", form: "form_save") %></div>
+
 </div>

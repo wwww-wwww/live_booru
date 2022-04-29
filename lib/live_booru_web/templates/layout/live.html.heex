@@ -1,18 +1,24 @@
 <header>
-  <section class="container">
-    <nav>
+  <nav>
+    <div>
       <%= nav_link @socket, "Index", LiveBooruWeb.IndexLive %>
       <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
       <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
-      <%= render "_user_menu.html", assigns %>
+      <%= if assigns[:current_user] do %>
+      <%= nav_link (assigns[:socket] || assigns[:conn]), "Upload", LiveBooruWeb.UploadLive %>
+      <% end %>
       <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
         <%= link "LiveDashboard", to: Routes.live_dashboard_path(@socket, :home) %>
       <% end %>
-    </nav>
-  </section>
+    </div>
+    <%= render "_user_menu.html", assigns %>
+  </nav>
 </header>
 
-<main class="container">
+<main class="flex">
+  <%#= live_render(@socket, LiveBooruWeb.SearchLive, id: "view_search", sticky: true, q: assigns[:search]) %>
+  <.live_component module={LiveBooruWeb.SearchLive} id="search" q={assigns[:search]} />
+
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>
@@ -20,9 +26,6 @@
   <p class="alert alert-danger" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
-
-  <%#= live_render(@socket, LiveBooruWeb.SearchLive, id: "view_search") %>
-  <.live_component module={LiveBooruWeb.SearchLive} id="search" q={assigns[:search]} />
 
   <%= @inner_content %>
 </main>

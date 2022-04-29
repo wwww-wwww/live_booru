@@ -1,11 +1,8 @@
 <div class="search">
 
 <form phx-submit="search" phx-target={assigns[:myself]}>
-
-<%= tag(:input, name: :query, value: @q) %>
-
-<%= submit("Search") %>
-
+  <%= tag(:input, name: :query, value: @q) %>
+  <%= submit("Search") %>
 </form>
 
 </div>

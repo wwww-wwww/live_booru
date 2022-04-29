@@ -8,7 +8,12 @@ defmodule LiveBooruWeb.TagListLive do
   end
 
   def mount(_, _session, socket) do
-    socket = assign(socket, tags: Repo.all(Tag) |> Enum.sort_by(& &1.id, :desc))
+    tags =
+      Repo.all(Tag)
+      |> Repo.count_tags()
+      |> Enum.sort_by(&elem(&1, 0).id, :desc)
+
+    socket = assign(socket, tags: tags)
     {:ok, socket}
   end
 

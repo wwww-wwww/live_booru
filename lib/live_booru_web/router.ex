@@ -90,5 +90,6 @@ defmodule LiveBooruWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     delete "/users/log_out", UserSessionController, :delete
+    get "/users/log_out", UserSessionController, :delete
   end
 end
