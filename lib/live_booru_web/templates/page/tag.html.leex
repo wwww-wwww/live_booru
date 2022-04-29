@@ -19,7 +19,7 @@
     <form phx-submit="save">
       <select name="type">
         <%= for type <- Ecto.Enum.values(LiveBooru.Tag, :type) do %>
-        <option value="<%= type %>" <%= if @tag.type == type do %>selected<%= end %>><%= type %></option>
+        <option value="<%= type %>" <%= if @tag.type == type do %>selected<% end %>><%= type %></option>
         <% end %>
       </select>
       <%= submit("Save") %>

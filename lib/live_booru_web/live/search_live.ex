@@ -1,8 +1,6 @@
 defmodule LiveBooruWeb.SearchLive do
   use LiveBooruWeb, :live_component
 
-  alias LiveBooru.{Repo, EncodeJob, Encoder}
-
   def render(assigns) do
     LiveBooruWeb.PageView.render("search.html", assigns)
   end

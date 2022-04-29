@@ -2,7 +2,6 @@ defmodule LiveBooruWeb.UserRegistrationController do
   use LiveBooruWeb, :controller
 
   alias LiveBooru.Accounts
-  alias LiveBooru.Accounts.User
   alias LiveBooruWeb.UserAuth
 
   def create(conn, %{"user" => user_params}) do

@@ -3,7 +3,7 @@ defmodule LiveBooru.Accounts do
   The Accounts context.
   """
 
-  use LiveBooruWeb, :live_view
+  import Phoenix.LiveView
   import Ecto.Query, warn: false
   alias LiveBooru.Repo
 

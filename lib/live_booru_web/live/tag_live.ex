@@ -49,11 +49,6 @@ defmodule LiveBooruWeb.TagLive do
     {:noreply, socket}
   end
 
-  def handle_event("edit", _, socket) do
-    socket = assign(socket, :editing, true)
-    {:noreply, socket}
-  end
-
   def change_tag(socket, attrs, check) do
     case Repo.get(Tag, socket.assigns.tag.id) do
       nil ->
@@ -93,6 +88,11 @@ defmodule LiveBooruWeb.TagLive do
           put_flash(socket, :error, "Not allowed")
         end
     end
+  end
+
+  def handle_event("edit", _, socket) do
+    socket = assign(socket, :editing, true)
+    {:noreply, socket}
   end
 
   def handle_event("lock", _, socket) do

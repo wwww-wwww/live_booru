@@ -7,7 +7,7 @@ defmodule LiveBooruWeb.ImageLive do
     LiveBooruWeb.PageView.render("image.html", assigns)
   end
 
-  def mount(%{"id" => id}, session, socket) do
+  def mount(%{"id" => id}, _session, socket) do
     Repo.get(Image, id)
     |> Repo.preload([[collections: :images], :tags, :user, :votes, :comments])
     |> case do

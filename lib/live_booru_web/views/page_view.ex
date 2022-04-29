@@ -3,8 +3,6 @@ defmodule LiveBooruWeb.PageView do
 
   alias LiveBooru.{Repo, Tag}
 
-  import Ecto.Query, only: [from: 2]
-
   def image(socket, assigns, %{id: id, thumb: thumb}) do
     live_patch(to: Routes.live_path(socket, LiveBooruWeb.ImageLive, id)) do
       case assigns[:image] do
