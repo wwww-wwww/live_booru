@@ -47,6 +47,7 @@ defmodule LiveBooruWeb do
       use Phoenix.LiveView,
         layout: {LiveBooruWeb.LayoutView, "live.html"},
         container: {:div, class: __MODULE__ |> to_string() |> String.split(".") |> Enum.at(-1)}
+
       on_mount LiveBooru.Accounts
 
       unquote(view_helpers())

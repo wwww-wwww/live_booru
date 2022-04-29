@@ -72,6 +72,12 @@ nav {
 }
 
 .ImageLive {
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
   .collection {
     display: flex;
     gap: 0.5em;
@@ -83,6 +89,70 @@ nav {
 
   img {
     box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: 10em;
+  }
+
+  .comments {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    max-width: 1400px;
+
+    > div {
+      display: flex;
+
+      > div:first-child {
+        padding: 1em;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        width: 4rem;
+      }
+
+      > div:last-child {
+        padding: 0.5em;
+        background-color: rgb(240, 240, 240);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        > div:first-child {
+          display: flex;
+          align-items: center;
+
+          > div {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+          }
+
+          > div:first-child {
+            flex: 1;
+          }
+
+          .icon {
+            font-family: "Material Icons";
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25em;
+          }
+        }
+      }
+    }
+  }
+
+  .comment_form {
+    > .controls {
+      display: flex;
+      gap: 0.5em;
+    }
   }
 }
 
@@ -104,11 +174,6 @@ button {
   border: 1px solid darkgray;
 }
 
-textarea {
-  width: 100%;
-  height: 20em;
-}
-
 .search,
 .SearchLive {
   padding: 0.5em;
@@ -121,6 +186,13 @@ textarea {
       flex: 1;
       border: 1px solid lightgrey;
     }
+  }
+}
+
+.TagLive {
+  textarea {
+    width: 100%;
+    height: 20em;
   }
 }
 

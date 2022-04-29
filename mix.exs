@@ -52,7 +52,7 @@ defmodule LiveBooru.MixProject do
       {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev},
       {:size, "~> 0.1.0"},
       {:timex, "~> 3.0"},
-      {:earmark, "~> 1.4"},
+      {:earmark, "~> 1.4"}
     ]
   end
 

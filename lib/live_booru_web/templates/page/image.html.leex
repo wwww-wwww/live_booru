@@ -79,10 +79,61 @@
 
 <div class="content">
 
-<%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+<div>
+  <%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+</div>
 
 <%= if !is_nil(@image.title) and String.length(@image.title) > 0 do %>
 <h2><%= @image.title %></h2>
+<% end %>
+
+<h3>Comments</h3>
+<div class="comments">
+  <%= for comment <- @comments do %>
+  <div id="comment_<%= comment.id %>">
+    <div>
+      <span><%= comment.user.name %></span>
+    </div>
+    <div>
+      <div>
+        <div>
+          <%= Timex.from_now(comment.inserted_at) %>
+          <%= link("##{comment.id}", to: "#comment_#{comment.id}") %>
+        </div>
+        <div>
+          <%= if !is_nil(assigns[:current_user]) and comment.user_id == @current_user.id do %>
+            <%= submit("delete", class: "icon", value: comment.id, phx_click: "comment_delete") %>
+          <% end %>
+          <%= submit("reply", class: "icon", value: comment.id, phx_click: "comment_reply") %>
+        </div>
+      </div>
+      <div>
+        <%= raw format_description(@socket, comment.text) %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>
+
+<%= if assigns[:current_user] do %>
+<form class="comment_form" phx-submit="comment_create" phx-change="comment_save">
+  <%= if @editing do %>
+    <textarea name="comment" required><%= @current_comment %></textarea>
+  <% else %>
+    <div>
+      <%= raw @preview %>
+    </div>
+  <% end %>
+  <div class="controls">
+    <%= if @editing do %>
+      <%= submit("Preview", form: "", phx_click: "comment_preview") %>
+    <% else %>
+      <%= submit("Edit", form: "", phx_click: "comment_edit") %>
+    <% end %>
+
+    <%= submit("Submit") %>
+  </div>
+</form>
 <% end %>
 
 <h3>Collections</h3>
@@ -96,6 +147,6 @@
   <% end %>
 </div>
 
-</div>
+</div> <%# content %>
 
-</div>
+</div> <%# middle %>
