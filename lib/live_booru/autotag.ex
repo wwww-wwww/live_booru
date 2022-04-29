@@ -17,13 +17,19 @@ defmodule LiveBooru.AutoTag do
     alpha =
       jxlinfo
       |> String.split("\n")
-      |> Enum.any?(&(String.trim(&1) |> String.starts_with?("type: Alpha")))
+      |> Enum.any?(&(String.trim(&1) == "type: Alpha"))
 
     {w, h} = dimensions(jxlinfo)
     mp = w * h
 
+    grayscale =
+      jxlinfo
+      |> String.split("\n")
+      |> Enum.any?(&(String.trim(&1) == "num_color_channels: 1"))
+
     tags
     |> append_if(alpha, "Alpha Transparency")
+    |> append_if(grayscale, "Grayscale")
     |> append_if(mp > 1_900_000, "Absurd Resolution")
     |> append_if(mp > 6_000_000, "Absurd Resolution")
     |> Enum.uniq()
