@@ -1,7 +1,7 @@
 <div class="middle">
 <div class="content">
 
-<%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+<%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}")) %>
 
 <table>
   <tr><td>Image</td><td><%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></td></tr>

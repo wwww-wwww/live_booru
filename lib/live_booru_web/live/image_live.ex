@@ -148,7 +148,7 @@ defmodule LiveBooruWeb.ImageLive do
   def handle_event("comment_create", _, socket) do
     case String.trim(socket.assigns.current_comment) do
       "" ->
-        {:noreply, put_flash(socket, :error, "Comment can't be empty.")}
+        {:noreply, put_flash(socket, :comment_error, "Comment can't be empty.")}
 
       comment ->
         Comment.new(comment, socket.assigns.current_user, socket.assigns.image)
@@ -170,7 +170,7 @@ defmodule LiveBooruWeb.ImageLive do
             {:noreply, socket}
 
           {:error, cs} ->
-            {:noreply, put_flash(socket, :error, inspect(cs))}
+            {:noreply, put_flash(socket, :comment_error, inspect(cs))}
         end
     end
   end

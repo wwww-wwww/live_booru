@@ -17,7 +17,7 @@
 
 <%= for image <- @images do %>
   <%= live_redirect(to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, image.id)) do %>
-    <%= img_tag(Routes.page_path(@socket, :thumb, Path.basename(image.thumb))) %>
+    <%= img_tag(Routes.static_path(@socket, "/thumb/#{Path.basename(image.thumb)}")) %>
   <% end %>
 <% end %>
 

@@ -91,7 +91,7 @@
 <div class="content">
 
 <div>
-  <%= img_tag(Routes.page_path(@socket, :file, Path.basename(@image.path))) %>
+  <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}")) %>
 </div>
 
 <%= if !is_nil(@image.title) and String.length(@image.title) > 0 do %>
@@ -107,6 +107,10 @@
 
 <%= if assigns[:current_user] do %>
 <form class="comment_form" phx-submit="comment_create" phx-change="comment_save">
+  <p class="alert alert-danger" role="alert"
+    phx-click="lv:clear-flash"
+    phx-value-key="comment_error"><%= live_flash(@flash, :comment_error) %></p>
+
   <%= if @editing do %>
     <textarea name="comment" required><%= @current_comment %></textarea>
   <% else %>

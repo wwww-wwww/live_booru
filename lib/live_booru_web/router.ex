@@ -20,9 +20,6 @@ defmodule LiveBooruWeb.Router do
   scope "/", LiveBooruWeb do
     pipe_through :browser
 
-    get "/file/:file", PageController, :file
-    get "/thumb/:file", PageController, :thumb
-
     live "/", IndexLive
     live "/queue", QueueLive
     live "/image/:id/more", ImageMoreLive

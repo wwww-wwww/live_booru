@@ -3,7 +3,7 @@
 <h1>Editing <%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
 
 <div>
-  <%= img_tag(Routes.page_path(@socket, :thumb, Path.basename(@image.thumb))) %>
+  <%= img_tag(Routes.static_path(@socket, "/thumb/#{Path.basename(@image.thumb)}")) %>
 </div>
 
 <form id="form_save" phx-change="validate" phx-submit="save">

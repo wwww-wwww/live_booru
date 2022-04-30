@@ -7,10 +7,10 @@ defmodule LiveBooruWeb.PageView do
     live_patch(to: Routes.live_path(socket, LiveBooruWeb.ImageLive, id)) do
       case assigns[:image] do
         %{id: ^id} ->
-          img_tag(Routes.page_path(socket, :thumb, Path.basename(thumb)), class: "selected")
+          img_tag(Routes.static_path(socket, "/thumb/#{Path.basename(thumb)}"), class: "selected")
 
         _ ->
-          img_tag(Routes.page_path(socket, :thumb, Path.basename(thumb)))
+          img_tag(Routes.static_path(socket, "/thumb/#{Path.basename(thumb)}"))
       end
     end
   end
