@@ -3,6 +3,7 @@ defmodule LiveBooruWeb.TagLive do
   on_mount LiveBooru.Accounts
 
   alias LiveBooru.{Repo, Tag}
+  import Ecto.Query, only: [from: 2]
 
   def render(assigns) do
     LiveBooruWeb.PageView.render("tag.html", assigns)
@@ -16,7 +17,10 @@ defmodule LiveBooruWeb.TagLive do
          |> put_flash(:error, "Tag does not exist")
          |> push_redirect(to: "/")}
 
-      tag ->
+      %{id: id} = tag ->
+        query_count = from t in Tag, where: t.id == ^id
+        count = Repo.aggregate(query_count, :count)
+
         socket =
           socket
           |> assign(
@@ -24,8 +28,10 @@ defmodule LiveBooruWeb.TagLive do
             LiveBooru.Accounts.admin?(socket.assigns[:current_user]) or
               (not tag.locked and !is_nil(socket.assigns[:current_user]))
           )
+          |> assign(:edit_level, LiveBooru.Accounts.level(socket.assigns[:current_user]))
           |> assign(:editing, false)
           |> assign(:tag, tag)
+          |> assign(:count, count)
 
         {:ok, socket}
     end

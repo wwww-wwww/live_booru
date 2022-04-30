@@ -68,6 +68,7 @@ defmodule LiveBooruWeb.UploadLive do
           Repo.all(query)
           |> Enum.map(& &1.name)
           |> Kernel.--(MapSet.to_list(socket.assigns.tags))
+          |> Enum.sort()
 
         socket |> assign(:suggestions, suggestions)
       else

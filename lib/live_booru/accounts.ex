@@ -196,4 +196,8 @@ defmodule LiveBooru.Accounts do
   def admin?(nil), do: false
 
   def admin?(user), do: user.level >= 100
+
+  def level(nil), do: -1
+
+  def level(user), do: user.level
 end

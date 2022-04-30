@@ -262,6 +262,7 @@ button {
 
       section {
         border: 1px solid black;
+        border-radius: 0.25rem;
         padding: 1em;
       }
 
@@ -309,7 +310,7 @@ button {
       padding: 0.5em;
       cursor: pointer;
       border: none;
-      border-radius: 2em;
+      border-radius: 100vh;
       background-color: rgb(230, 230, 230);
     }
 
@@ -379,34 +380,35 @@ main {
   }
 }
 
-.description {
-  white-space: pre;
+.alert {
+  padding: 1em;
+  margin: 1em;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
 }
 
-.alert {
-  padding: 15px;
-  margin-bottom: 20px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-}
 .alert-info {
   color: #31708f;
   background-color: #d9edf7;
   border-color: #bce8f1;
 }
+
 .alert-warning {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc;
 }
+
 .alert-danger {
   color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
 }
+
 .alert p {
   margin-bottom: 0;
 }
+
 .alert:empty {
   display: none;
 }
