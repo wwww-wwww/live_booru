@@ -30,7 +30,7 @@ defmodule LiveBooru.Image do
       join_through: LiveBooru.ImagesCollections,
       on_replace: :delete
 
-    has_many :votes, LiveBooru.Vote
+    has_many :votes, LiveBooru.ImageVote
     has_many :comments, LiveBooru.Comment
 
     has_many :changes, LiveBooru.ImageChange

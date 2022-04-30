@@ -1,18 +1,26 @@
+<div class="content">
+
 <h1>Log in</h1>
 
 <%= form_tag(Routes.user_session_path(@socket, :create)) do %>
+  <%= label(:user, :username) %>
+  <%= text_input(:user, :username, required: true) %>
 
-<%= tag(:input, type: "text", name: "username", placeholder: "Username") %>
-<%= tag(:input, type: "password", name: "password", placeholder: "Password") %>
+  <%= label(:user, :password) %>
+  <%= password_input(:user, :password, required: true) %>
 
-<div>
-<%= label("remember_me", "Keep me logged in for 60 days") %>
-<%= tag(:input, type: "checkbox", name: "remember_me") %>
-</div>
+  <div>
+  <%= label(:user, :remember_me, "Keep me logged in for 60 days") %>
+  <%= checkbox(:user, :remember_me) %>
+  </div>
 
-<%= submit("Log In") %>
+  <div>
+  <%= submit("Log In") %>
+  </div>
 <% end %>
 
 <p>
-  <%= live_patch "Register", to: Routes.live_path(@socket, LiveBooruWeb.SignUpLive) %>
+  <%= live_patch("Register", to: Routes.live_path(@socket, LiveBooruWeb.SignUpLive)) %>
 </p>
+
+</div>

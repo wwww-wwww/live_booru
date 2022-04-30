@@ -1,0 +1,33 @@
+<div id={"comment#{@comment.id}"}>
+  <div>
+    <span><%= @comment.user.name %></span>
+  </div>
+  <div>
+    <div class="header">
+      <div>
+        <%= Timex.from_now(@comment.inserted_at) %>
+        <%= link("##{@comment.id}", to: "#comment_#{@comment.id}") %>
+      </div>
+      <div>
+        <%= if !is_nil(assigns[:current_user]) and @comment.user_id == @current_user.id do %>
+          <%= submit("delete", class: "icon", phx_target: @myself, phx_click: "delete", value: @comment.id) %>
+        <% end %>
+        <%= submit("reply", class: "icon", value: @comment.id, phx_click: "comment_reply") %>
+      </div>
+    </div>
+    <div class="body">
+      <%= raw LiveBooruWeb.PageView.format_description(@socket, @comment.text) %>
+    </div>
+    <div class="footer">
+      <%= if assigns[:current_user] do %>
+        <% highlight = if @self_vote == true, do: " highlight", else: "" %>
+        <%= submit("thumb_up", phx_target: @myself, phx_click: "vote_up", value: @comment.id, class: "icon up#{highlight}") %>
+      <% end %>
+      <%= Enum.reduce(@comment.votes, 0, & &2 + (if &1.upvote, do: 1, else: -1)) %>
+      <%= if assigns[:current_user] do %>
+        <% highlight = if @self_vote == false, do: " highlight", else: "" %>
+        <%= submit("thumb_down", phx_target: @myself, phx_click: "vote_down", value: @comment.id, class: "icon down#{highlight}") %>
+      <% end %>
+    </div>
+  </div>
+</div>

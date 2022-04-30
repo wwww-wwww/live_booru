@@ -4,7 +4,9 @@ defmodule LiveBooruWeb.UserSessionController do
   alias LiveBooru.Accounts
   alias LiveBooruWeb.UserAuth
 
-  def create(conn, %{"username" => username, "password" => password} = user_params) do
+  def create(conn, %{"user" => user_params}) do
+    %{"username" => username, "password" => password} = user_params
+
     if user = Accounts.get_user_by_username_and_password(username, password) do
       UserAuth.log_in_user(conn, user, user_params)
     else

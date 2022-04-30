@@ -1,7 +1,8 @@
 defmodule LiveBooruWeb.ImageLive do
   use LiveBooruWeb, :live_view
 
-  alias LiveBooru.{Comment, Repo, Image}
+  alias LiveBooruWeb.Endpoint
+  alias LiveBooru.{Repo, Comment, Image, ImageVote}
 
   def render(assigns) do
     LiveBooruWeb.PageView.render("image.html", assigns)
@@ -9,7 +10,7 @@ defmodule LiveBooruWeb.ImageLive do
 
   def mount(%{"id" => id}, _session, socket) do
     Repo.get(Image, id)
-    |> Repo.preload([[collections: :images], :tags, :user, :votes, [comments: :user]])
+    |> Repo.preload([[collections: :images], :tags, :user, :votes, [comments: [:user, :votes]]])
     |> case do
       nil ->
         {:ok,
@@ -28,16 +29,34 @@ defmodule LiveBooruWeb.ImageLive do
           |> Repo.count_tags()
           |> Enum.sort_by(&elem(&1, 0).name)
 
+        self_vote =
+          case socket.assigns[:current_user] do
+            nil ->
+              nil
+
+            user ->
+              Repo.get_by(ImageVote, user_id: user.id, image_id: image.id)
+              |> case do
+                nil -> nil
+                vote -> vote.upvote
+              end
+          end
+
+        comments =
+          Enum.map(image.comments, &{&1.id, &1})
+          |> Map.new()
+
         socket =
           socket
           |> assign(:topic, topic)
           |> assign(:image, image)
           |> assign(:tags, tags)
           |> assign(:score, score)
+          |> assign(:self_vote, self_vote)
           |> assign(:current_comment, "")
           |> assign(:editing, true)
           |> assign(:preview, nil)
-          |> assign(:comments, image.comments)
+          |> assign(:comments, comments)
 
         {:ok, socket}
     end
@@ -48,20 +67,60 @@ defmodule LiveBooruWeb.ImageLive do
     {:noreply, socket}
   end
 
+  def handle_info(%{event: "score", payload: score}, socket) do
+    {:noreply, assign(socket, score: score)}
+  end
+
   def handle_info(%{event: "comment", payload: comment}, socket) do
-    {:noreply,
-     assign(socket, :comments, Enum.uniq_by(socket.assigns.comments ++ [comment], & &1.id))}
+    {:noreply, assign(socket, :comments, Map.put(socket.assigns.comments, comment.id, comment))}
   end
 
   def handle_info(%{event: "comment_delete", payload: comment}, socket) do
-    {:noreply,
-     assign(socket, :comments, Enum.filter(socket.assigns.comments, &(&1.id != comment)))}
+    {:noreply, assign(socket, :comments, Map.delete(socket.assigns.comments, comment))}
+  end
+
+  def handle_info(%{event: "comment_update", payload: comment}, socket) do
+    send_update(LiveBooruWeb.CommentComponent, id: "comment_#{comment.id}", comment: comment)
+    {:noreply, assign(socket, :comments, Map.put(socket.assigns.comments, comment.id, comment))}
+  end
+
+  def handle_event("vote_up", _, socket) do
+    ImageVote.add(socket.assigns.current_user, socket.assigns.image, true)
+    |> case do
+      {:ok, up} ->
+        Endpoint.broadcast(
+          "image:#{socket.assigns.image.id}",
+          "score",
+          ImageVote.get_score(socket.assigns.image)
+        )
+
+        {:noreply, assign(socket, :self_vote, up)}
+
+      {:error, cs} ->
+        {:noreply, put_flash(socket, :error, inspect(cs))}
+    end
+  end
+
+  def handle_event("vote_down", _, socket) do
+    ImageVote.add(socket.assigns.current_user, socket.assigns.image, false)
+    |> case do
+      {:ok, up} ->
+        Endpoint.broadcast(
+          "image:#{socket.assigns.image.id}",
+          "score",
+          ImageVote.get_score(socket.assigns.image)
+        )
+
+        {:noreply, assign(socket, :self_vote, up)}
+
+      {:error, cs} ->
+        {:noreply, put_flash(socket, :error, inspect(cs))}
+    end
   end
 
   def handle_event("comment_reply", %{"value" => comment}, socket) do
     socket =
-      socket
-      |> assign(:current_comment, socket.assigns.current_comment <> "%Comment{#{comment}}")
+      assign(socket, :current_comment, socket.assigns.current_comment <> "%Comment{#{comment}}")
 
     {:noreply, socket}
   end
@@ -96,10 +155,10 @@ defmodule LiveBooruWeb.ImageLive do
         |> Repo.insert()
         |> case do
           {:ok, comment} ->
-            LiveBooruWeb.Endpoint.broadcast(
+            Endpoint.broadcast(
               "image:#{socket.assigns.image.id}",
               "comment",
-              comment
+              Repo.preload(comment, [:user, [votes: :user]])
             )
 
             socket =
@@ -113,27 +172,6 @@ defmodule LiveBooruWeb.ImageLive do
           {:error, cs} ->
             {:noreply, put_flash(socket, :error, inspect(cs))}
         end
-    end
-  end
-
-  def handle_event("comment_delete", %{"value" => comment}, socket) do
-    Repo.get(Comment, comment)
-    |> case do
-      nil ->
-        {:noreply, socket}
-
-      comment ->
-        if comment.user_id == socket.assigns.current_user.id do
-          Repo.delete(comment)
-
-          LiveBooruWeb.Endpoint.broadcast(
-            "image:#{socket.assigns.image.id}",
-            "comment_delete",
-            comment.id
-          )
-        end
-
-        {:noreply, socket}
     end
   end
 end

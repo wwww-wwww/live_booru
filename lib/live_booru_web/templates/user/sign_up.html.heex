@@ -1,3 +1,5 @@
+<div class="content">
+
 <h1>Register</h1>
 
 <.form let={f} for={@changeset} action={Routes.user_registration_path(@socket, :create)}>
@@ -7,19 +9,21 @@
     </div>
   <% end %>
 
-  <%= label f, :username %>
-  <%= text_input f, :username, required: true %>
-  <%= error_tag f, :username %>
+  <%= label(f, :username) %>
+  <%= text_input(f, :username, required: true) %>
+  <%= error_tag(f, :username) %>
 
-  <%= label f, :password %>
-  <%= password_input f, :password, required: true %>
-  <%= error_tag f, :password %>
+  <%= label(f, :password) %>
+  <%= password_input(f, :password, required: true) %>
+  <%= error_tag(f, :password) %>
 
   <div>
-    <%= submit "Register" %>
+    <%= submit("Register") %>
   </div>
 </.form>
 
 <p>
-  <%= live_patch "Log In", to: Routes.live_path(@socket, LiveBooruWeb.SignInLive) %>
+  <%= live_patch("Log In", to: Routes.live_path(@socket, LiveBooruWeb.SignInLive)) %>
 </p>
+
+</div>

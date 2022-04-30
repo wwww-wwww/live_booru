@@ -107,6 +107,7 @@ nav {
       display: flex;
 
       > div:first-child {
+        /* user */
         padding: 1em;
         display: flex;
         align-items: flex-start;
@@ -115,6 +116,7 @@ nav {
       }
 
       > div:last-child {
+        /* right side */
         padding: 0.5em;
         background-color: rgb(240, 240, 240);
         flex: 1;
@@ -122,7 +124,7 @@ nav {
         flex-direction: column;
         justify-content: flex-start;
 
-        > div:first-child {
+        > .header {
           display: flex;
           align-items: center;
 
@@ -140,9 +142,14 @@ nav {
             font-family: "Material Icons";
             background: none;
             border: none;
-            cursor: pointer;
             padding: 0.25em;
           }
+        }
+
+        .footer {
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
         }
       }
     }
@@ -154,6 +161,35 @@ nav {
       gap: 0.5em;
     }
   }
+
+  .score {
+    display: flex;
+    gap: 0.25em;
+    align-items: center;
+  }
+
+  .icon {
+    padding: 0.25rem;
+    color: slategrey;
+  }
+
+  .up.highlight {
+    color: lightgreen;
+  }
+
+  .down.highlight {
+    color: lightcoral;
+  }
+}
+
+.icon {
+  font-family: "Material Icons";
+  background: none;
+  border: none;
+}
+
+button.icon {
+  cursor: pointer;
 }
 
 input,
@@ -196,6 +232,8 @@ button {
   }
 }
 
+.SignUpLive,
+.SignInLive,
 .UploadLive,
 .ImageEditLive,
 .TagLive {
@@ -231,7 +269,7 @@ button {
         display: flex;
         gap: 0.5em;
 
-        input {
+        input:not([type="checkbox"]) {
           flex: 1;
         }
       }

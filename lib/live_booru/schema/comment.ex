@@ -8,6 +8,8 @@ defmodule LiveBooru.Comment do
     belongs_to :image, LiveBooru.Image
     belongs_to :user, LiveBooru.Accounts.User
 
+    has_many :votes, LiveBooru.CommentVote
+
     timestamps()
   end
 
@@ -15,6 +17,6 @@ defmodule LiveBooru.Comment do
     change(%__MODULE__{}, %{text: text})
     |> put_assoc(:user, user)
     |> put_assoc(:image, image)
-    |> validate_required([:user, :image])
+    |> validate_required([:text, :user, :image])
   end
 end

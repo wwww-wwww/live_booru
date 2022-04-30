@@ -59,7 +59,18 @@
   <li>Title: <%= @image.title %></li>
   <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_patch("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
   <li>Source: <%= @image.source %></li>
-  <li>Score: <%= @score %></li>
+  <li class="score">
+    Score:
+    <%= if assigns[:current_user] do %>
+      <% highlight = if @self_vote == true, do: " highlight", else: "" %>
+      <%= submit("thumb_up", phx_click: "vote_up", class: "icon up#{highlight}") %>
+    <% end %>
+    <%= @score %>
+    <%= if assigns[:current_user] do %>
+      <% highlight = if @self_vote == false, do: " highlight", else: "" %>
+      <%= submit("thumb_down", phx_click: "vote_down", class: "icon down#{highlight}") %>
+    <% end %>
+  </li>
   <li>Content Rating:
   <%= cond do %>
   <% Enum.any?(@image.tags, & &1.name == "NSFW") -> %>NSFW
@@ -89,29 +100,8 @@
 
 <h3>Comments</h3>
 <div class="comments">
-  <%= for comment <- @comments do %>
-  <div id="comment_<%= comment.id %>">
-    <div>
-      <span><%= comment.user.name %></span>
-    </div>
-    <div>
-      <div>
-        <div>
-          <%= Timex.from_now(comment.inserted_at) %>
-          <%= link("##{comment.id}", to: "#comment_#{comment.id}") %>
-        </div>
-        <div>
-          <%= if !is_nil(assigns[:current_user]) and comment.user_id == @current_user.id do %>
-            <%= submit("delete", class: "icon", value: comment.id, phx_click: "comment_delete") %>
-          <% end %>
-          <%= submit("reply", class: "icon", value: comment.id, phx_click: "comment_reply") %>
-        </div>
-      </div>
-      <div>
-        <%= raw format_description(@socket, comment.text) %>
-      </div>
-    </div>
-  </div>
+  <%= for {id, comment} <- @comments do %>
+  <%= live_component(LiveBooruWeb.CommentComponent, id: "comment_#{id}", comment: comment, current_user: assigns[:current_user]) %>
   <% end %>
 </div>
 
