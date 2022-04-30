@@ -20,7 +20,7 @@ defmodule LiveBooruWeb.Router do
   scope "/", LiveBooruWeb do
     pipe_through :browser
 
-    live_session :default, on_mount: LiveBooru.Accounts do
+    live_session :default, on_mount: LiveBooruWeb.UserAuth do
       live "/", IndexLive
       live "/queue", QueueLive
       live "/image/:id/more", ImageMoreLive

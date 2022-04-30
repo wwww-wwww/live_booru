@@ -1,6 +1,5 @@
 defmodule LiveBooruWeb.ImageEditLive do
   use LiveBooruWeb, :live_view
-  on_mount LiveBooru.Accounts
 
   alias LiveBooru.{Repo, Tag, Image}
 

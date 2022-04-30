@@ -3,7 +3,6 @@ defmodule LiveBooru.Accounts do
   The Accounts context.
   """
 
-  import Phoenix.LiveView
   import Ecto.Query, warn: false
   alias LiveBooru.Repo
 
@@ -183,14 +182,6 @@ defmodule LiveBooru.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
-  end
-
-  def on_mount(:default, _, %{"current_user" => current_user}, socket) do
-    {:cont, assign(socket, :current_user, current_user)}
-  end
-
-  def on_mount(:default, _, _, socket) do
-    {:cont, assign(socket, :current_user, nil)}
   end
 
   def admin?(nil), do: false

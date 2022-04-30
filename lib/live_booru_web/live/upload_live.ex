@@ -9,10 +9,9 @@ defmodule LiveBooruWeb.UploadLive do
     LiveBooruWeb.PageView.render("upload.html", assigns)
   end
 
-  def mount(_params, %{"current_user" => current_user}, socket) do
+  def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:current_user, current_user)
       |> assign(:title, "")
       |> assign(:source, "")
       |> assign(:rating, "nsfw")
