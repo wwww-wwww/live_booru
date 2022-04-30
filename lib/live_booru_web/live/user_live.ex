@@ -12,6 +12,7 @@ end
 
 defmodule LiveBooruWeb.SignUpLive do
   use LiveBooruWeb, :live_view
+  on_mount LiveBooru.Accounts
 
   alias LiveBooru.Accounts
   alias LiveBooru.Accounts.User
@@ -22,6 +23,7 @@ defmodule LiveBooruWeb.SignUpLive do
 
   def mount(_, _, socket) do
     changeset = Accounts.change_user_registration(%User{})
+
     socket = assign(socket, changeset: changeset)
     {:ok, socket}
   end

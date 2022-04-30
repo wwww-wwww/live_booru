@@ -3,19 +3,19 @@
 <h1>Register</h1>
 
 <.form let={f} for={@changeset} action={Routes.user_registration_path(@socket, :create)}>
-  <%= if @changeset.action do %>
+  <%= if !is_nil(live_flash(@flash, :username_error)) or !is_nil(live_flash(@flash, :password_error)) do %>
     <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
+      Oops, something went wrong! Please check the errors below.
     </div>
   <% end %>
 
   <%= label(f, :username) %>
   <%= text_input(f, :username, required: true) %>
-  <%= error_tag(f, :username) %>
+  <%= error_tag(f, :username, live_flash(@flash, :username_error)) %>
 
   <%= label(f, :password) %>
   <%= password_input(f, :password, required: true) %>
-  <%= error_tag(f, :password) %>
+  <%= error_tag(f, :username, live_flash(@flash, :password_error)) %>
 
   <div>
     <%= submit("Register") %>

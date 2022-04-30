@@ -4,7 +4,7 @@
       <%= nav_link @socket, "Index", LiveBooruWeb.IndexLive %>
       <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
       <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
-      <%= if assigns[:current_user] do %>
+      <%= if assigns.current_user do %>
       <%= nav_link (assigns[:socket] || assigns[:conn]), "Upload", LiveBooruWeb.UploadLive %>
       <% end %>
       <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
@@ -17,6 +17,7 @@
 
 <main class="flex">
   <%#= live_render(@socket, LiveBooruWeb.SearchLive, id: "view_search", sticky: true, q: assigns[:search]) %>
+
   <.live_component module={LiveBooruWeb.SearchLive} id="search" q={assigns[:search]} />
 
   <p class="alert alert-info" role="alert"

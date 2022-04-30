@@ -16,7 +16,7 @@ defmodule LiveBooruWeb.UserSettingsControllerTest do
     test "redirects if user is not logged in" do
       conn = build_conn()
       conn = get(conn, Routes.user_settings_path(conn, :edit))
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == Routes.live_path(conn, LiveBooruWeb.SignInLive)
     end
   end
 
@@ -123,7 +123,7 @@ defmodule LiveBooruWeb.UserSettingsControllerTest do
     test "redirects if user is not logged in", %{token: token} do
       conn = build_conn()
       conn = get(conn, Routes.user_settings_path(conn, :confirm_email, token))
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == Routes.live_path(conn, LiveBooruWeb.SignInLive)
     end
   end
 end

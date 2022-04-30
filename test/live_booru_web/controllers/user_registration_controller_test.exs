@@ -5,7 +5,7 @@ defmodule LiveBooruWeb.UserRegistrationControllerTest do
 
   describe "GET /users/register" do
     test "renders registration page", %{conn: conn} do
-      conn = get(conn, Routes.user_registration_path(conn, :new))
+      conn = get(conn, Routes.live_path(conn, LiveBooruWeb.SignUpLive))
       response = html_response(conn, 200)
       assert response =~ "<h1>Register</h1>"
       assert response =~ "Log in</a>"
@@ -13,7 +13,11 @@ defmodule LiveBooruWeb.UserRegistrationControllerTest do
     end
 
     test "redirects if already logged in", %{conn: conn} do
-      conn = conn |> log_in_user(user_fixture()) |> get(Routes.user_registration_path(conn, :new))
+      conn =
+        conn
+        |> log_in_user(user_fixture())
+        |> get(Routes.live_path(conn, LiveBooruWeb.SignUpLive))
+
       assert redirected_to(conn) == "/"
     end
   end

@@ -61,12 +61,12 @@
   <li>Source: <%= @image.source %></li>
   <li class="score">
     Score:
-    <%= if assigns[:current_user] do %>
+    <%= if assigns.current_user do %>
       <% highlight = if @self_vote == true, do: " highlight", else: "" %>
       <%= submit("thumb_up", phx_click: "vote_up", class: "icon up#{highlight}") %>
     <% end %>
     <%= @score %>
-    <%= if assigns[:current_user] do %>
+    <%= if assigns.current_user do %>
       <% highlight = if @self_vote == false, do: " highlight", else: "" %>
       <%= submit("thumb_down", phx_click: "vote_down", class: "icon down#{highlight}") %>
     <% end %>
@@ -82,7 +82,7 @@
 
 <%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
 
-<%= if assigns[:current_user] do %>
+<%= if assigns.current_user do %>
 <%= live_patch("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
 <% end %>
 
@@ -101,11 +101,11 @@
 <h3>Comments</h3>
 <div class="comments">
   <%= for {id, comment} <- @comments do %>
-  <%= live_component(LiveBooruWeb.CommentComponent, id: "comment_#{id}", comment: comment, current_user: assigns[:current_user]) %>
+  <%= live_component(LiveBooruWeb.CommentComponent, id: "comment_#{id}", comment: comment, current_user: assigns.current_user) %>
   <% end %>
 </div>
 
-<%= if assigns[:current_user] do %>
+<%= if assigns.current_user do %>
 <form class="comment_form" phx-submit="comment_create" phx-change="comment_save">
   <p class="alert alert-danger" role="alert"
     phx-click="lv:clear-flash"

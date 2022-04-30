@@ -20,25 +20,34 @@ defmodule LiveBooruWeb.Router do
   scope "/", LiveBooruWeb do
     pipe_through :browser
 
-    live "/", IndexLive
-    live "/queue", QueueLive
-    live "/image/:id/more", ImageMoreLive
-    live "/image/:id/changes", ImageChangesLive
-    live "/image/:id", ImageLive
+    live_session :default, on_mount: LiveBooru.Accounts do
+      live "/", IndexLive
+      live "/queue", QueueLive
+      live "/image/:id/more", ImageMoreLive
+      live "/image/:id/changes", ImageChangesLive
+      live "/image/:id", ImageLive
 
-    live "/tag/id/:id", TagLive
-    live "/tag/name/:name", TagLive
+      live "/tag/id/:id", TagLive
+      live "/tag/name/:name", TagLive
 
-    live "/tag/id/:id/changes", TagChangesLive
-    live "/tag/name/:name/changes", TagChangesLive
+      live "/tag/id/:id/changes", TagChangesLive
+      live "/tag/name/:name/changes", TagChangesLive
 
-    live "/tags", TagListLive
+      live "/tags", TagListLive
 
-    scope "/" do
-      pipe_through :require_authenticated_user
-      live "/upload", UploadLive
+      scope "/" do
+        pipe_through :require_authenticated_user
 
-      live "/image/:id/edit", ImageEditLive
+        live "/upload", UploadLive
+        live "/image/:id/edit", ImageEditLive
+      end
+
+      scope "/users" do
+        pipe_through :redirect_if_user_is_authenticated
+
+        live "/log_in", SignInLive
+        live "/register", SignUpLive
+      end
     end
   end
 
@@ -68,9 +77,6 @@ defmodule LiveBooruWeb.Router do
 
   scope "/", LiveBooruWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
-
-    live "/users/log_in", SignInLive
-    live "/users/register", SignUpLive
 
     post "/users/register", UserRegistrationController, :create
     post "/users/log_in", UserSessionController, :create

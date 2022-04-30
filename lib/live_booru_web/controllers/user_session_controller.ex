@@ -11,7 +11,9 @@ defmodule LiveBooruWeb.UserSessionController do
       UserAuth.log_in_user(conn, user, user_params)
     else
       # In order to prevent user enumeration attacks, don't disclose whether the username is registered.
-      render(conn, "new.html", error_message: "Invalid username or password")
+      conn
+      |> put_flash(:error, "Invalid username or password.")
+      |> redirect(to: Routes.live_path(conn, LiveBooruWeb.SignInLive))
     end
   end
 

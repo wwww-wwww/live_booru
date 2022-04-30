@@ -12,7 +12,7 @@ defmodule LiveBooruWeb.CommentComponent do
     socket = assign(socket, assigns)
 
     self_vote =
-      if socket.assigns[:current_user] do
+      if socket.assigns.current_user do
         Enum.filter(socket.assigns.comment.votes, &(&1.user_id == socket.assigns.current_user.id))
         |> case do
           [] -> nil

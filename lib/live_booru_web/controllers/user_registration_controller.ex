@@ -12,7 +12,10 @@ defmodule LiveBooruWeb.UserRegistrationController do
         |> UserAuth.log_in_user(user)
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        conn
+        |> put_flash(:username_error, Keyword.get(changeset.errors, :username, nil))
+        |> put_flash(:password_error, Keyword.get(changeset.errors, :password, nil))
+        |> redirect(to: Routes.live_path(conn, LiveBooruWeb.SignUpLive))
     end
   end
 end

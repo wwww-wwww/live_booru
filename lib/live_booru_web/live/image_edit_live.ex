@@ -78,7 +78,7 @@ defmodule LiveBooruWeb.ImageEditLive do
     value = String.trim(value)
 
     omit =
-      if LiveBooru.Accounts.admin?(socket.assigns[:current_user]) do
+      if LiveBooru.Accounts.admin?(socket.assigns.current_user) do
         []
       else
         [:meta_system]

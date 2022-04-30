@@ -190,7 +190,7 @@ defmodule LiveBooru.Accounts do
   end
 
   def on_mount(:default, _, _, socket) do
-    {:cont, socket}
+    {:cont, assign(socket, :current_user, nil)}
   end
 
   def admin?(nil), do: false

@@ -30,7 +30,7 @@ defmodule LiveBooruWeb.ImageLive do
           |> Enum.sort_by(&elem(&1, 0).name)
 
         self_vote =
-          case socket.assigns[:current_user] do
+          case socket.assigns.current_user do
             nil ->
               nil
 

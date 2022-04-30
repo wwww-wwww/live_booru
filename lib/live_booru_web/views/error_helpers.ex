@@ -17,6 +17,15 @@ defmodule LiveBooruWeb.ErrorHelpers do
     end)
   end
 
+  def error_tag(_form, _field, nil), do: nil
+
+  def error_tag(form, field, error) do
+    content_tag(:span, translate_error(error),
+      class: "invalid-feedback",
+      phx_feedback_for: input_name(form, field)
+    )
+  end
+
   @doc """
   Translates an error message using gettext.
   """
