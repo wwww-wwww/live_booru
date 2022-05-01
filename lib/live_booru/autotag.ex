@@ -13,19 +13,27 @@ defmodule LiveBooru.AutoTag do
     if condition, do: list ++ [item], else: list
   end
 
-  def tag(tags, jxlinfo, _job) do
+  def tag(tags, jxlinfo, _job, decoded) do
     alpha =
       jxlinfo
       |> String.split("\n")
       |> Enum.any?(&(String.trim(&1) == "type: Alpha"))
-
-    {w, h} = dimensions(jxlinfo)
-    mp = w * h
+      |> if do
+        case System.cmd("python3", ["check_alpha.py", decoded]) do
+          {output, 0} -> String.trim(output) == "True"
+          _ -> true
+        end
+      else
+        false
+      end
 
     grayscale =
       jxlinfo
       |> String.split("\n")
       |> Enum.any?(&(String.trim(&1) == "num_color_channels: 1"))
+
+    {w, h} = dimensions(jxlinfo)
+    mp = w * h
 
     tags
     |> append_if(alpha, "Alpha Transparency")

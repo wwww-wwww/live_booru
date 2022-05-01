@@ -155,7 +155,7 @@ defmodule LiveBooru.Encoder do
 
     tags =
       tags
-      |> LiveBooru.AutoTag.tag(jxlinfo, job)
+      |> LiveBooru.AutoTag.tag(jxlinfo, job, decoded)
       |> Enum.map(fn tag_name ->
         case Repo.get_by(Tag, name: tag_name) do
           nil -> Tag.new(tag_name, :general)

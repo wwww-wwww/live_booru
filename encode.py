@@ -18,7 +18,8 @@ def has_no_alpha(im):
 
 
 def encode(file):
-  subprocess.run(cjxl_args + [file, file + ".jxl"], capture_output=True)
+  p = subprocess.run(cjxl_args + [file, file + ".jxl"], capture_output=True)
+  if p.returncode != 0: exit(1)
   return file + ".jxl"
 
 
@@ -49,8 +50,9 @@ def main():
       im.convert("L").save(sys.argv[1] + "_L.png")
       inputs.append(sys.argv[1] + "_L.png")
 
-  im.save(sys.argv[1] + ".png")
-  inputs.append(sys.argv[1] + ".png")
+  if not sys.argv[1].lower().endswith(".png"):
+    im.save(sys.argv[1] + ".png")
+    inputs.append(sys.argv[1] + ".png")
 
   outputs = []
   for file in inputs:
