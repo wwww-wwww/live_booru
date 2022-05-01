@@ -34,6 +34,7 @@ defmodule LiveBooru.Encoder do
         {:noreply, %{state | active: false}}
 
       job ->
+        LiveBooruWeb.QueueLive.update()
         if Uploader.exists?(job.hash) do
           WorkerManager.finish(EncoderManager, job)
         else
@@ -120,6 +121,7 @@ defmodule LiveBooru.Encoder do
         end
 
         GenServer.cast(self(), :loop)
+        LiveBooruWeb.QueueLive.update()
 
         {:noreply, %{state | active: true}}
     end

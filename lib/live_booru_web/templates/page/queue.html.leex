@@ -3,6 +3,15 @@
 <h1>Queue</h1>
 
 <table>
+
+<tr>
+  <th>Upload Hash</th>
+  <th>Source</th>
+  <th>Uploader</th>
+  <th>Working</th>
+  <th>Date</th>
+</tr>
+
 <%= for {job, working} <- @queue do %>
 <tr>
   <td><%= job.hash %></td>

@@ -125,6 +125,7 @@ defmodule LiveBooruWeb.UploadLive do
             |> Repo.insert()
             |> case do
               {:ok, _job} ->
+                LiveBooruWeb.QueueLive.update()
                 LiveBooru.Encoder.notify()
                 {:ok, :ok}
 
