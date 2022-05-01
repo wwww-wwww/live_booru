@@ -10,7 +10,9 @@ defmodule LiveBooru.Accounts.User do
 
     has_many(:collections, LiveBooru.Collection)
     has_many(:uploads, LiveBooru.Upload)
-    has_many(:votes, LiveBooru.Vote)
+    has_many(:images, LiveBooru.Image)
+    has_many(:image_votes, LiveBooru.ImageVote)
+    has_many(:comment_votes, LiveBooru.CommentVote)
     has_many(:comments, LiveBooru.Comment)
     has_many(:encode_jobs, LiveBooru.EncodeJob)
 

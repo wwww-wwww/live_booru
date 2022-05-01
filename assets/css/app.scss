@@ -3,6 +3,7 @@
 
 html,
 body {
+  min-width: 700px;
   height: 100%;
 }
 
@@ -72,6 +73,18 @@ nav {
 }
 
 .ImageLive {
+  .main_image {
+    max-width: max(100%, 400px);
+    max-height: max(calc(100vh - 12rem), 400px);
+    cursor: zoom-in;
+  }
+
+  #chk_expand:checked + label > .main_image {
+    max-width: unset;
+    max-height: unset;
+    cursor: zoom-out;
+  }
+
   .content {
     display: flex;
     flex-direction: column;
@@ -97,28 +110,39 @@ nav {
     height: 10em;
   }
 
-  .comments {
+  .bottom {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
     max-width: 1400px;
+  }
 
-    > div {
+  .comments {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+
+    .comment {
       display: flex;
+      flex-direction: column;
+      background-color: rgb(240, 240, 240);
+      padding: 0.5em;
+      border-radius: 0.25rem;
 
-      > div:first-child {
+      > .header {
         /* user */
-        padding: 1em;
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        width: 4rem;
+        gap: 0.5em;
+
+        > :first-child {
+          flex: 1;
+        }
       }
 
-      > div:last-child {
+      > .body {
         /* right side */
-        padding: 0.5em;
-        background-color: rgb(240, 240, 240);
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -145,13 +169,32 @@ nav {
             padding: 0.25em;
           }
         }
+      }
 
-        .footer {
-          display: flex;
-          align-items: center;
-          gap: 0.5em;
+      > .footer {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+
+        > :first-child {
+          flex: 1;
         }
       }
+    }
+
+    @keyframes comment_highlight {
+      from {
+        background-color: lightgreen;
+      }
+      to {
+        background-color: rgb(240, 240, 240);
+      }
+    }
+
+    .comment:target {
+      animation-name: comment_highlight;
+      animation-duration: 2s;
+      outline: 1px solid lightgrey;
     }
   }
 
@@ -366,7 +409,6 @@ main {
   .content {
     flex: 1;
     padding: 1em;
-    overflow: auto;
     box-shadow: inset 0 0 0.5em rgba(0, 0, 0, 0.2);
   }
 }
@@ -377,6 +419,35 @@ main {
     flex-wrap: wrap;
     gap: 0.25em;
     font-size: 0.9rem;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  li.meta {
+    color: #33ccad;
+  }
+
+  li.meta_system {
+    color: #33ccad;
+  }
+
+  li.copyright {
+    color: #77ca24;
+  }
+
+  li.character {
+    color: #c5902f;
+  }
+
+  li.general {
+    color: #9d35e6;
+  }
+
+  li.artist {
+    color: #e75744;
   }
 }
 
