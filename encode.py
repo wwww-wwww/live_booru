@@ -50,7 +50,7 @@ def main():
       im.convert("L").save(sys.argv[1] + "_L.png")
       inputs.append(sys.argv[1] + "_L.png")
 
-  if not sys.argv[1].lower().endswith(".png"):
+  if im.format != "PNG":
     im.save(sys.argv[1] + ".png")
     inputs.append(sys.argv[1] + ".png")
 
