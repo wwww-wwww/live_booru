@@ -58,7 +58,7 @@
   <li>Uploader: <%= @image.user.name %></li>
   <li>Title: <%= @image.title %></li>
   <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_patch("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
-  <li>Source: <%= @image.source %></li>
+  <li>Source: <%= @source %></li>
   <li class="score">
     Score:
     <%= if assigns.current_user do %>

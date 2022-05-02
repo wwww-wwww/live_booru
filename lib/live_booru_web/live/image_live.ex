@@ -46,10 +46,18 @@ defmodule LiveBooruWeb.ImageLive do
           Enum.map(image.comments, &{&1.id, &1})
           |> Map.new()
 
+        source =
+          URI.parse(image.source)
+          |> case do
+            %URI{host: nil} -> image.source
+            _ -> live_redirect(image.source, to: image.source)
+          end
+
         socket =
           socket
           |> assign(:topic, topic)
           |> assign(:image, image)
+          |> assign(:source, source)
           |> assign(:tags, tags)
           |> assign(:score, score)
           |> assign(:self_vote, self_vote)
