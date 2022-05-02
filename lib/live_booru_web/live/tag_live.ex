@@ -18,9 +18,11 @@ defmodule LiveBooruWeb.TagLive do
          |> put_flash(:error, "Tag does not exist")
          |> push_redirect(to: "/")}
 
-      %{id: id} = tag ->
-        query_count = from t in Tag, where: t.id == ^id
-        count = Repo.aggregate(query_count, :count)
+      tag ->
+        count =
+          Repo.count_tags([tag])
+          |> Enum.at(0)
+          |> elem(1)
 
         socket =
           socket
