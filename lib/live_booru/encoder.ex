@@ -25,7 +25,7 @@ defmodule LiveBooru.Encoder do
   end
 
   def handle_cast(:loop, state) do
-    case WorkerManager.pop(EncoderManager) do
+    case WorkerManager.pop(EncoderManager, sort_by: & &1.is_jxl, order: :desc) do
       :empty ->
         if state.active do
           # Status.put(state.id, "Idle")
@@ -70,53 +70,68 @@ defmodule LiveBooru.Encoder do
                 IO.inspect(err)
             end
           else
-            if pixels_hash = Uploader.get_pixels_hash(in_path) do
-              # if pixels of image exists, remember image
-              if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
-                create_upload(image, job)
+            # TODO: deal with animated images
+            case Uploader.get_format(in_path) do
+              nil -> nil
+              "JPEG" -> true
+              "PNG" -> true
+              "GIF" -> true
+              "WEBP" -> true
+            end
+            |> case do
+              nil ->
                 File.rm(in_path)
                 WorkerManager.finish(EncoderManager, job)
-              else
-                case System.cmd("python3", ["encode.py", in_path, in_path <> ".f.jxl"]) do
-                  {output, 0} ->
-                    [version, params | _] = String.split(output, "\n")
 
-                    if hash = Uploader.get_hash(in_path <> ".f.jxl") do
-                      decoded = in_path <> ".f.jxl.png"
+              true ->
+                if pixels_hash = Uploader.get_pixels_hash(in_path) do
+                  # if pixels of image exists, remember image
+                  if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
+                    create_upload(image, job)
+                    File.rm(in_path)
+                    WorkerManager.finish(EncoderManager, job)
+                  else
+                    case System.cmd("python3", ["encode.py", in_path, in_path <> ".f.jxl"]) do
+                      {output, 0} ->
+                        [version, params | _] = String.split(output, "\n")
 
-                      case Uploader.decode_jxl(
-                             in_path <> ".f.jxl",
-                             decoded,
-                             &Uploader.get_pixels_hash/1
-                           ) do
-                        {:ok, new_pixels_hash} ->
-                          create_image(
-                            job,
-                            hash,
-                            new_pixels_hash,
-                            in_path <> ".f.jxl",
-                            decoded,
-                            {version, params},
-                            fn image ->
-                              create_upload(image, job)
-                              File.rm(in_path)
-                              File.rm(decoded)
-                            end
-                          )
+                        if hash = Uploader.get_hash(in_path <> ".f.jxl") do
+                          decoded = in_path <> ".f.jxl.png"
 
-                        err ->
-                          IO.inspect(err)
-                      end
+                          case Uploader.decode_jxl(
+                                 in_path <> ".f.jxl",
+                                 decoded,
+                                 &Uploader.get_pixels_hash/1
+                               ) do
+                            {:ok, new_pixels_hash} ->
+                              create_image(
+                                job,
+                                hash,
+                                new_pixels_hash,
+                                in_path <> ".f.jxl",
+                                decoded,
+                                {version, params},
+                                fn image ->
+                                  create_upload(image, job)
+                                  File.rm(in_path)
+                                  File.rm(decoded)
+                                end
+                              )
 
-                      File.rm(decoded)
-                    else
-                      IO.inspect(output)
+                            err ->
+                              IO.inspect(err)
+                          end
+
+                          File.rm(decoded)
+                        else
+                          IO.inspect(output)
+                        end
+
+                      err ->
+                        IO.inspect(err)
                     end
-
-                  err ->
-                    IO.inspect(err)
+                  end
                 end
-              end
             end
           end
         end

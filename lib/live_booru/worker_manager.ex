@@ -22,9 +22,10 @@ defmodule LiveBooru.WorkerManager do
   end
 
   # always hot
-  def handle_call({:pop, track}, _from, state) do
+  def handle_call({:pop, opts}, _from, state) do
     Repo.all(state.queue)
     |> Enum.filter(&(&1.id not in Enum.map(state.working, fn j -> j.id end)))
+    |> Enum.sort_by(Keyword.get(opts, :sort_by, fn _ -> nil end), Keyword.get(opts, :order, :asc))
     |> Enum.at(0)
     |> case do
       nil ->
@@ -34,7 +35,7 @@ defmodule LiveBooru.WorkerManager do
         job = Repo.preload(job, :user)
 
         working =
-          if track do
+          if Keyword.get(opts, :track, true) do
             state.working ++ [job]
           else
             state.working
@@ -81,8 +82,8 @@ defmodule LiveBooru.WorkerManager do
     GenServer.call(pid, :get)
   end
 
-  def pop(pid, track \\ true) do
-    GenServer.call(pid, {:pop, track})
+  def pop(pid, opts \\ []) do
+    GenServer.call(pid, {:pop, opts})
   end
 
   def notify(pid), do: GenServer.cast(pid, :notify)

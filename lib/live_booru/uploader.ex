@@ -40,4 +40,11 @@ defmodule LiveBooru.Uploader do
   end
 
   def job_exists?(hash), do: Repo.get_by(EncodeJob, hash: hash) != nil
+
+  def get_format(path) do
+    case System.cmd("python3", ["format.py", path]) do
+      {output, 0} -> String.trim(output)
+      _err -> nil
+    end
+  end
 end

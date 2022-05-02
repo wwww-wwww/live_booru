@@ -47,6 +47,8 @@ defmodule LiveBooru.EncodeJob do
     field :tags, {:array, :string}
     field :source, :string
 
+    field :is_jxl, :boolean
+
     field :title, :string
 
     belongs_to :user, LiveBooru.Accounts.User

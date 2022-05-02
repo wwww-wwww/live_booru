@@ -120,7 +120,8 @@ defmodule LiveBooruWeb.UploadLive do
               hash: hash,
               tags: MapSet.to_list(socket.assigns.tags) ++ rating_tag,
               source: source,
-              title: title
+              title: title,
+              is_jxl: LiveBooru.Jxl.path_is_jxl?(path)
             }
             |> Ecto.Changeset.change()
             |> Ecto.Changeset.put_assoc(:user, socket.assigns.current_user)
