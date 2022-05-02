@@ -13,6 +13,23 @@
 
 <div class="content">
 
+<% current_page = floor(@offset / @search_metadata.limit) %>
+
+<div class="pages">
+<%= for i <- 1..@search_metadata.pages do %>
+  <%= if i - 1 == current_page do %>
+    <span><%= i %></span>
+  <% else %>
+    <%= live_redirect(i,
+      to: Routes.live_path(
+        @socket,
+        LiveBooruWeb.IndexLive,
+        q: @search,
+        offset: (i - 1) * @search_metadata.limit)) %>
+  <% end %>
+<% end %>
+</div>
+
 <div class="images">
 
 <%= for image <- @images do %>
@@ -21,6 +38,21 @@
   <% end %>
 <% end %>
 
+</div>
+
+<div class="pages">
+<%= for i <- 1..@search_metadata.pages do %>
+  <%= if i - 1 == current_page do %>
+    <span><%= i %></span>
+  <% else %>
+    <%= live_redirect(i,
+      to: Routes.live_path(
+        @socket,
+        LiveBooruWeb.IndexLive,
+        q: @search,
+        offset: (i - 1) * @search_metadata.limit)) %>
+  <% end %>
+<% end %>
 </div>
 
 </div>

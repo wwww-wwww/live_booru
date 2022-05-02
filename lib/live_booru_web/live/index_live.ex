@@ -1,9 +1,7 @@
 defmodule LiveBooruWeb.IndexLive do
   use LiveBooruWeb, :live_view
 
-  alias LiveBooru.{Repo, Image}
-
-  import Ecto.Query, only: [from: 2]
+  alias LiveBooru.{Repo}
 
   def render(assigns) do
     LiveBooruWeb.PageView.render("index.html", assigns)
@@ -21,41 +19,35 @@ defmodule LiveBooruWeb.IndexLive do
     |> Enum.sort_by(&elem(&1, 0).name, :asc)
   end
 
-  def mount(%{"q" => ""}, _session, socket) do
-    query = from i in Image, order_by: [desc: i.inserted_at]
+  def mount(%{"q" => q, "offset" => offset}, _session, socket) do
+    {offset, _} = Integer.parse(to_string(offset))
+    {images, search_metadata} = Repo.search(q, offset: offset)
 
     images =
-      Repo.all(query)
+      images
       |> Repo.preload([:tags])
 
     socket =
       socket
       |> assign(:images, images)
+      |> assign(:search_metadata, search_metadata)
       |> assign(:tags, tags(images))
-      |> assign(:search, "")
+      |> assign(:search, q)
+      |> assign(:offset, offset)
 
     {:ok, socket}
   end
 
-  def mount(%{"q" => q}, _session, socket) do
-    images =
-      Repo.search(q)
-      |> Repo.preload([:tags])
-
-    socket =
-      socket
-      |> assign(:images, images)
-      |> assign(:tags, tags(images))
-      |> assign(:search, q)
-
-    {:ok, socket}
+  def mount(%{"q" => q}, session, socket) do
+    mount(%{"q" => q, "offset" => 0}, session, socket)
   end
 
   def mount(_params, session, socket) do
-    mount(%{"q" => ""}, session, socket)
+    mount(%{"q" => "", "offset" => 0}, session, socket)
   end
 
   def handle_params(params, session, socket) do
+    IO.inspect(params)
     {:ok, socket} = mount(params, session, socket)
     {:noreply, socket}
   end

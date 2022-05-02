@@ -3,9 +3,11 @@ defmodule LiveBooru.Repo do
     otp_app: :live_booru,
     adapter: Ecto.Adapters.Postgres
 
+  @limit 40
+
   alias LiveBooru.{Repo, ImagesTags, Tag, Image}
 
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, only: [from: 1, from: 2, limit: 2, offset: 2, order_by: 2]
 
   # input: [%Tag{}]
   # output: [{%Tag{}, n}]
@@ -63,7 +65,38 @@ defmodule LiveBooru.Repo do
     {Enum.uniq(terms_include), Enum.uniq(terms_exclude)}
   end
 
-  def search(query) do
+  def filter(query, opts \\ []) do
+    query = order_by(query, desc: :id)
+
+    query =
+      case Keyword.get(opts, :order, :date) do
+        :date -> order_by(query, desc: :inserted_at)
+      end
+
+    count = LiveBooru.Repo.aggregate(query, :count)
+
+    results =
+      opts
+      |> Map.new()
+      |> case do
+        %{offset: n} -> offset(query, ^n)
+        _ -> query
+      end
+      |> limit(@limit)
+      |> Repo.all()
+
+    {results, %{count: count, pages: ceil(count / @limit), limit: @limit}}
+  end
+
+  def search(_, _ \\ [])
+
+  def search("", opts) do
+    query = from(i in Image)
+
+    filter(query, opts)
+  end
+
+  def search(query, opts) do
     {inc, exc} = Repo.parse_terms(query)
 
     query =
@@ -78,8 +111,7 @@ defmodule LiveBooru.Repo do
               group_by: it.image_id
 
           from i in Image,
-            where: i.id not in subquery(query_exclude),
-            order_by: [desc: i.inserted_at]
+            where: i.id not in subquery(query_exclude)
 
         {inc, exc} ->
           query =
@@ -102,11 +134,10 @@ defmodule LiveBooru.Repo do
           from i in Image,
             join: s in subquery(query),
             on: s.image_id == i.id,
-            where: i.id not in subquery(query_exclude),
-            order_by: [desc: i.inserted_at]
+            where: i.id not in subquery(query_exclude)
       end
 
-    Repo.all(query)
+    filter(query, opts)
   end
 
   def build_search_tags(query) do
