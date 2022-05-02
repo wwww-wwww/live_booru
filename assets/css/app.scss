@@ -122,82 +122,6 @@ nav {
     flex-direction: column;
     gap: 0.5em;
 
-    .comment {
-      display: flex;
-      flex-direction: column;
-      background-color: rgb(240, 240, 240);
-      padding: 0.5em;
-      border-radius: 0.25rem;
-
-      > .header {
-        /* user */
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 0.5em;
-
-        > :first-child {
-          flex: 1;
-        }
-      }
-
-      > .body {
-        /* right side */
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-
-        > .header {
-          display: flex;
-          align-items: center;
-
-          > div {
-            display: flex;
-            gap: 0.5em;
-            align-items: center;
-          }
-
-          > div:first-child {
-            flex: 1;
-          }
-
-          .icon {
-            font-family: "Material Icons";
-            background: none;
-            border: none;
-            padding: 0.25em;
-          }
-        }
-      }
-
-      > .footer {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-
-        > :first-child {
-          flex: 1;
-        }
-      }
-    }
-
-    @keyframes comment_highlight {
-      from {
-        background-color: lightgreen;
-      }
-      to {
-        background-color: rgb(240, 240, 240);
-      }
-    }
-
-    .comment:target {
-      animation-name: comment_highlight;
-      animation-duration: 2s;
-      outline: 1px solid lightgrey;
-    }
-  }
-
   .comment_form {
     > .controls {
       display: flex;
@@ -222,6 +146,102 @@ nav {
 
   .down.highlight {
     color: lightcoral;
+  }
+}
+
+.comment {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(240, 240, 240);
+  padding: 0.5em;
+  border-radius: 0.25rem;
+
+  > .header {
+    /* user */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5em;
+
+    > :first-child {
+      flex: 1;
+    }
+  }
+
+  > .body {
+    /* right side */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    > .header {
+      display: flex;
+      align-items: center;
+
+      > div {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+      }
+
+      > div:first-child {
+        flex: 1;
+      }
+
+      .icon {
+        font-family: "Material Icons";
+        background: none;
+        border: none;
+        padding: 0.25em;
+      }
+    }
+  }
+
+  > .footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+
+    > :first-child {
+      flex: 1;
+    }
+  }
+
+  .icon {
+    padding: 0.25rem;
+    color: slategrey;
+  }
+
+  .up.highlight {
+    color: lightgreen;
+  }
+
+  .down.highlight {
+    color: lightcoral;
+  }
+}
+
+@keyframes comment_highlight {
+  from {
+    background-color: lightgreen;
+  }
+  to {
+    background-color: rgb(240, 240, 240);
+  }
+}
+
+.comment:target {
+  animation-name: comment_highlight;
+  animation-duration: 2s;
+  outline: 1px solid lightgrey;
+}
+
+.CommentsLive {
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
   }
 }
 

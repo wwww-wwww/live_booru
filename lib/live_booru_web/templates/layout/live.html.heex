@@ -2,6 +2,7 @@
   <nav>
     <div>
       <%= nav_link @socket, "Index", LiveBooruWeb.IndexLive %>
+      <%= nav_link @socket, "Comments", LiveBooruWeb.CommentsLive %>
       <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
       <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
       <%= if assigns.current_user do %>

@@ -1,0 +1,9 @@
+<div class="content">
+
+<h1>Comments</h1>
+
+<%= for comment <- @comments do %>
+  <%= live_component(LiveBooruWeb.CommentComponent, id: "comment_#{comment.id}", comment: comment, current_user: @current_user) %>
+<% end %>
+
+</div>
