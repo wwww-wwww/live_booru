@@ -34,6 +34,7 @@ defmodule LiveBooruWeb.CommentComponent do
     |> case do
       {:ok, _} ->
         LiveBooruWeb.CommentsLive.update()
+
         Endpoint.broadcast(
           "image:#{socket.assigns.comment.image_id}",
           "comment_update",
@@ -52,6 +53,7 @@ defmodule LiveBooruWeb.CommentComponent do
     |> case do
       {:ok, _} ->
         LiveBooruWeb.CommentsLive.update()
+
         Endpoint.broadcast(
           "image:#{socket.assigns.comment.image_id}",
           "comment_update",
@@ -76,6 +78,7 @@ defmodule LiveBooruWeb.CommentComponent do
           Repo.delete(comment)
 
           LiveBooruWeb.CommentsLive.update()
+
           Endpoint.broadcast(
             "image:#{socket.assigns.comment.image_id}",
             "comment_delete",

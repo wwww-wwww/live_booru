@@ -114,7 +114,7 @@ defmodule LiveBooruWeb.PageView do
       live_patch(tag.name,
         to: Routes.live_path(socket, LiveBooruWeb.IndexLive, q: quote_tag(tag))
       ),
-      content_tag(:span) do
+      content_tag(:span, class: "count") do
         count
       end
     ]

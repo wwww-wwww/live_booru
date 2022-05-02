@@ -23,6 +23,7 @@ defmodule LiveBooruWeb.Router do
     live_session :default, on_mount: LiveBooruWeb.UserAuth do
       live "/", IndexLive
       live "/queue", QueueLive
+      live "/comments", CommentsLive
       live "/image/:id/more", ImageMoreLive
       live "/image/:id/changes", ImageChangesLive
       live "/image/:id", ImageLive

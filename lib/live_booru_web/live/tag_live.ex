@@ -2,7 +2,6 @@ defmodule LiveBooruWeb.TagLive do
   use LiveBooruWeb, :live_view
 
   alias LiveBooru.{Repo, Tag}
-  import Ecto.Query, only: [from: 2]
 
   def render(assigns) do
     LiveBooruWeb.PageView.render("tag.html", assigns)
@@ -59,7 +58,8 @@ defmodule LiveBooruWeb.TagLive do
   end
 
   def change_tag(socket, attrs, admin \\ true) do
-    if admin and LiveBooru.Accounts.admin?(socket.assigns.current_user) do
+    if (!is_nil(socket.assigns.current_user) and not admin) or
+         LiveBooru.Accounts.admin?(socket.assigns.current_user) do
       case Repo.get(Tag, socket.assigns.tag.id) do
         nil ->
           socket
