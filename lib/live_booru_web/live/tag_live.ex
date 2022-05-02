@@ -9,7 +9,9 @@ defmodule LiveBooruWeb.TagLive do
   end
 
   def mount(%Tag{} = tag, _session, socket) do
-    case tag do
+    tag
+    |> Repo.preload([:aliases, :tag])
+    |> case do
       nil ->
         {:ok,
          socket
@@ -54,15 +56,15 @@ defmodule LiveBooruWeb.TagLive do
     {:noreply, socket}
   end
 
-  def change_tag(socket, attrs, check) do
-    case Repo.get(Tag, socket.assigns.tag.id) do
-      nil ->
-        socket
-        |> put_flash(:error, "Tag does not exist")
-        |> push_redirect(to: "/")
+  def change_tag(socket, attrs, admin \\ true) do
+    if admin and LiveBooru.Accounts.admin?(socket.assigns.current_user) do
+      case Repo.get(Tag, socket.assigns.tag.id) do
+        nil ->
+          socket
+          |> put_flash(:error, "Tag does not exist")
+          |> push_redirect(to: "/")
 
-      tag ->
-        if check.() do
+        tag ->
           case Ecto.Changeset.change(tag, attrs) do
             %{changes: changes} when map_size(changes) == 0 ->
               socket
@@ -82,16 +84,16 @@ defmodule LiveBooruWeb.TagLive do
                   end
 
                   socket
-                  |> assign(:tag, tag)
+                  |> assign(:tag, Repo.preload(tag, [:tag, :aliases]))
                   |> assign(:editing, false)
 
                 {:error, cs} ->
                   socket |> put_flash(:error, inspect(cs))
               end
           end
-        else
-          put_flash(socket, :error, "Not allowed")
-        end
+      end
+    else
+      put_flash(socket, :error, "Not allowed")
     end
   end
 
@@ -101,43 +103,51 @@ defmodule LiveBooruWeb.TagLive do
   end
 
   def handle_event("lock", _, socket) do
-    socket =
-      change_tag(socket, %{locked: true}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
-      end)
+    socket = change_tag(socket, %{locked: true})
 
     {:noreply, socket}
   end
 
   def handle_event("unlock", _, socket) do
-    socket =
-      change_tag(socket, %{locked: false}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
-      end)
+    socket = change_tag(socket, %{locked: false})
 
     {:noreply, socket}
   end
 
   def handle_event("save", %{"name" => name}, socket) do
-    socket =
-      change_tag(socket, %{name: name}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
-      end)
+    socket = change_tag(socket, %{name: name})
 
     {:noreply, socket}
   end
 
   def handle_event("save", %{"type" => type}, socket) do
-    socket =
-      change_tag(socket, %{type: String.to_atom(type)}, fn ->
-        LiveBooru.Accounts.admin?(socket.assigns.current_user)
-      end)
+    socket = change_tag(socket, %{type: String.to_atom(type)})
 
     {:noreply, socket}
   end
 
   def handle_event("save", %{"description" => description}, socket) do
-    socket = change_tag(socket, %{description: description}, fn -> true end)
+    socket = change_tag(socket, %{description: description}, false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("save", %{"tag" => tag_name}, socket) do
+    socket =
+      case String.trim(tag_name) do
+        "" ->
+          change_tag(socket, %{tag_id: nil})
+
+        tag_name ->
+          Repo.get_by(Tag, name: tag_name)
+          |> case do
+            nil ->
+              put_flash(socket, :error, "Tag does not exist")
+
+            tag ->
+              change_tag(socket, %{tag_id: tag.id})
+          end
+      end
 
     {:noreply, socket}
   end

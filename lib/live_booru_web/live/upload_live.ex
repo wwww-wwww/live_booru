@@ -1,7 +1,7 @@
 defmodule LiveBooruWeb.UploadLive do
   use LiveBooruWeb, :live_view
 
-  alias LiveBooru.{EncodeJob, Tag, Repo, Uploader}
+  alias LiveBooru.{EncodeJob, Repo, Uploader}
 
   import Ecto.Query, only: [from: 2]
 
@@ -61,7 +61,9 @@ defmodule LiveBooruWeb.UploadLive do
 
     socket =
       if String.length(value) > 0 do
-        query = from(t in Tag, where: ilike(t.name, ^"%#{value}%") and t.type != :meta_system)
+        query =
+          from t in Repo.build_search_tags(value),
+            where: t.type != :meta_system
 
         suggestions =
           Repo.all(query)
@@ -69,7 +71,7 @@ defmodule LiveBooruWeb.UploadLive do
           |> Kernel.--(MapSet.to_list(socket.assigns.tags))
           |> Enum.sort()
 
-        socket |> assign(:suggestions, suggestions)
+        assign(socket, :suggestions, suggestions)
       else
         socket
       end

@@ -6,7 +6,7 @@
 <h3>Artists</h3>
 <ul class="taglist">
   <%= for {tag, n} <- artists do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
@@ -16,7 +16,7 @@
 <h3>Copyrights</h3>
 <ul class="taglist">
   <%= for {tag, n} <- copyrights do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
@@ -26,7 +26,7 @@
 <h3>Characters</h3>
 <ul class="taglist">
   <%= for {tag, n} <- characters do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
@@ -36,7 +36,7 @@
 <h3>Meta</h3>
 <ul class="taglist">
   <%= for {tag, n} <- meta do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>
@@ -46,7 +46,7 @@
 <h3>Tags</h3>
 <ul class="taglist">
   <%= for {tag, n} <- tags do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n) %></li>
   <% end %>
 </ul>
 <% end %>

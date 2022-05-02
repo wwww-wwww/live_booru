@@ -5,7 +5,7 @@
 <h3>Tags</h3>
 <ul class="taglist">
   <%= for {tag, n} <- @tags do %>
-  <li class="<%= tag.type %>"><%= tag_link(@socket, tag, n, @search) %></li>
+  <li class={tag.type}><%= tag_link(@socket, tag, n, @search) %></li>
   <% end %>
 </ul>
 

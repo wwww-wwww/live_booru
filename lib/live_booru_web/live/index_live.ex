@@ -1,7 +1,7 @@
 defmodule LiveBooruWeb.IndexLive do
   use LiveBooruWeb, :live_view
 
-  alias LiveBooru.{Repo, Tag, Image}
+  alias LiveBooru.{Repo, Image}
 
   import Ecto.Query, only: [from: 2]
 
@@ -38,48 +38,8 @@ defmodule LiveBooruWeb.IndexLive do
   end
 
   def mount(%{"q" => q}, _session, socket) do
-    query =
-      case Repo.search(q) do
-        {[], exc} ->
-          query_exclude =
-            from t in Tag,
-              join: it in LiveBooru.ImagesTags,
-              on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^exc,
-              select: it.image_id,
-              group_by: it.image_id
-
-          from i in Image,
-            where: i.id not in subquery(query_exclude),
-            order_by: [desc: i.inserted_at]
-
-        {inc, exc} ->
-          query =
-            from t in Tag,
-              join: it in LiveBooru.ImagesTags,
-              on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^inc,
-              select: it.image_id,
-              group_by: it.image_id,
-              having: count() == ^length(inc)
-
-          query_exclude =
-            from t in Tag,
-              join: it in LiveBooru.ImagesTags,
-              on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^exc,
-              select: it.image_id,
-              group_by: it.image_id
-
-          from i in Image,
-            join: s in subquery(query),
-            on: s.image_id == i.id,
-            where: i.id not in subquery(query_exclude),
-            order_by: [desc: i.inserted_at]
-      end
-
     images =
-      Repo.all(query)
+      Repo.search(q)
       |> Repo.preload([:tags])
 
     socket =

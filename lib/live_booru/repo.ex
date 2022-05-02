@@ -3,7 +3,7 @@ defmodule LiveBooru.Repo do
     otp_app: :live_booru,
     adapter: Ecto.Adapters.Postgres
 
-  alias LiveBooru.{Repo, ImagesTags}
+  alias LiveBooru.{Repo, ImagesTags, Tag, Image}
 
   import Ecto.Query, only: [from: 2]
 
@@ -27,7 +27,7 @@ defmodule LiveBooru.Repo do
 
   @re_search ~r/((?:-){0,1}(?:\"(?:\\(?:\\\\)*\")+(?:[^\\](?:\\(?:\\\\)*\")+|[^\"])*\"|\"(?:[^\\](?:\\(?:\\\\)*\")+|[^\"])*\"|[^ ]+))/iu
 
-  def search(query) do
+  def parse_terms(query) do
     {terms_include, terms_exclude} =
       Regex.scan(@re_search, query)
       |> Enum.map(&Enum.at(&1, 1))
@@ -61,5 +61,84 @@ defmodule LiveBooru.Repo do
       end)
 
     {Enum.uniq(terms_include), Enum.uniq(terms_exclude)}
+  end
+
+  def search(query) do
+    {inc, exc} = Repo.parse_terms(query)
+
+    query =
+      case {inc, exc} do
+        {[], exc} ->
+          query_exclude =
+            from t in Tag,
+              join: it in LiveBooru.ImagesTags,
+              on: it.tag_id == t.id,
+              where: fragment("lower(?)", t.name) in ^exc,
+              select: it.image_id,
+              group_by: it.image_id
+
+          from i in Image,
+            where: i.id not in subquery(query_exclude),
+            order_by: [desc: i.inserted_at]
+
+        {inc, exc} ->
+          query =
+            from t in Tag,
+              join: it in LiveBooru.ImagesTags,
+              on: it.tag_id == t.id,
+              where: fragment("lower(?)", t.name) in ^inc,
+              select: it.image_id,
+              group_by: it.image_id,
+              having: count() == ^length(inc)
+
+          query_exclude =
+            from t in Tag,
+              join: it in LiveBooru.ImagesTags,
+              on: it.tag_id == t.id,
+              where: fragment("lower(?)", t.name) in ^exc,
+              select: it.image_id,
+              group_by: it.image_id
+
+          from i in Image,
+            join: s in subquery(query),
+            on: s.image_id == i.id,
+            where: i.id not in subquery(query_exclude),
+            order_by: [desc: i.inserted_at]
+      end
+
+    Repo.all(query)
+  end
+
+  def build_search_tags(query) do
+    query_aliases =
+      from t in Tag,
+        where: ilike(t.name, ^"%#{query}%") and not is_nil(t.tag_id)
+
+    aliases_tags =
+      from t in Tag,
+        join: a in subquery(query_aliases),
+        on: t.id == a.tag_id,
+        select: t.id
+
+    from t in Tag,
+      where: (ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)
+  end
+
+  def get_tag(name) do
+    query_aliases =
+      from t in Tag,
+        where: ilike(t.name, ^name) and not is_nil(t.tag_id)
+
+    aliases_tags =
+      from t in Tag,
+        join: a in subquery(query_aliases),
+        on: t.id == a.tag_id,
+        select: t.id
+
+    query =
+      from t in Tag,
+        where: (ilike(t.name, ^name) and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)
+
+    Repo.one(query)
   end
 end

@@ -9,12 +9,5 @@ defmodule LiveBooru.Repo.Migrations.CreateTags do
     end
 
     create unique_index(:tags, :name)
-
-    create table(:aliases) do
-      add :name, :string, null: false
-      add :tag_id, references(:tags, on_delete: :delete_all)
-    end
-
-    create unique_index(:aliases, :name)
   end
 end

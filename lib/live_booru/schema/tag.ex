@@ -14,9 +14,11 @@ defmodule LiveBooru.Tag do
     field :locked, :boolean, default: false
 
     many_to_many :images, LiveBooru.Image, join_through: LiveBooru.ImagesTags
-    has_many :aliases, LiveBooru.Alias
+    has_many :aliases, LiveBooru.Tag
 
     has_many :changes, LiveBooru.TagChange
+
+    belongs_to :tag, LiveBooru.Tag
   end
 
   @doc false

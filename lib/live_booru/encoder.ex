@@ -35,6 +35,7 @@ defmodule LiveBooru.Encoder do
 
       job ->
         LiveBooruWeb.QueueLive.update()
+
         if Uploader.exists?(job.hash) do
           WorkerManager.finish(EncoderManager, job)
         else
@@ -157,7 +158,7 @@ defmodule LiveBooru.Encoder do
       tags
       |> LiveBooru.AutoTag.tag(jxlinfo, job, decoded)
       |> Enum.map(fn tag_name ->
-        case Repo.get_by(Tag, name: tag_name) do
+        case Repo.get_tag(tag_name) do
           nil -> Tag.new(tag_name, :general)
           tag -> Ecto.Changeset.change(tag)
         end

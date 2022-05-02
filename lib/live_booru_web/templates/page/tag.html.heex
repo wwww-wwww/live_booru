@@ -1,0 +1,94 @@
+<div class="content">
+
+<%= if @editing and @edit_level >= 100 do %>
+  <h3>Tag name</h3>
+  <form phx-submit="save">
+    <div>
+      <%= tag(:input, name: :name, value: @tag.name) %>
+      <%= submit("Save") %>
+    </div>
+  </form>
+<% else %>
+  <h1>
+    <%= live_patch(@tag.name, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: quote_tag(@tag))) %>
+  </h1>
+<% end %>
+
+<ul>
+  <li>ID: <%= @tag.id %></li>
+  <li>Type:
+    <%= if !is_nil(@tag.tag) do %>
+      Alias
+    <% else %>
+      <%= if @editing and @edit_level >= 100 do %>
+        <form phx-submit="save">
+          <div>
+            <select name="type">
+              <%= for type <- Ecto.Enum.values(LiveBooru.Tag, :type) do %>
+              <option value={type} selected={@tag.type == type}}>
+                <%= type %>
+              </option>
+              <% end %>
+            </select>
+            <%= submit("Save") %>
+          </div>
+        </form>
+      <% else %><%= @tag.type %><% end %>
+    <% end %>
+  </li>
+  <li>Count: <%= @count %></li>
+  <%= if @editing and @edit_level >= 100 do %>
+    <li>
+      <form phx-submit="save">
+        <div>
+          <input name="tag" value={if is_nil(@tag.tag), do: "", else: @tag.tag.name}>
+          <%= submit("Save") %>
+        </div>
+      </form>
+    </li>
+  <% else %>
+    <%= if !is_nil(@tag.tag) do %>
+      <li>
+        Belongs to:
+        <%= live_patch(@tag.tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, @tag.tag.id)) %>
+      </li>
+    <% end %>
+  <% end %>
+  <%= if length(@tag.aliases) > 0 do %>
+    <li>
+      Aliases:
+      <%= for alias <- @tag.aliases do %>
+        <%= live_patch(alias.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, alias.id)) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<h2>Description</h2>
+
+<%= if @editing do %>
+  <form phx-submit="save">
+    <textarea name="description"><%= @tag.description %></textarea>
+    <div>
+      <%= submit("Save") %>
+      <button type="submit" form="" phx-click="cancel">Cancel</button>
+    </div>
+  </form>
+
+  <%= if @tag.locked and @edit_level >= 100 do %>
+    <div><button type="submit" phx-click="unlock">Unlock</button></div>
+  <% else %>
+    <div><button type="submit" phx-click="lock">Lock</button></div>
+  <% end %>
+<% else %>
+  <div class="description">
+    <%= raw format_description(@socket, @tag.description) %>
+  </div>
+  <%= if @can_edit do %>
+    <div><button type="submit" phx-click="edit">Edit</button></div>
+  <% end %>
+<% end %>
+
+<%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.TagChangesLive, @tag.id)) %>
+
+</div>

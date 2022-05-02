@@ -85,7 +85,9 @@ defmodule LiveBooruWeb.ImageEditLive do
 
     socket =
       if String.length(value) > 0 do
-        query = from(t in Tag, where: ilike(t.name, ^"%#{value}%") and t.type not in ^omit)
+        query =
+          from t in Repo.build_search_tags(value),
+            where: t.type not in ^omit
 
         suggestions =
           Repo.all(query)
