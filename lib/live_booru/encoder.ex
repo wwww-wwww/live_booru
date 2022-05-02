@@ -25,7 +25,7 @@ defmodule LiveBooru.Encoder do
   end
 
   def handle_cast(:loop, state) do
-    case WorkerManager.pop(EncoderManager, sort_by: & &1.is_jxl, order: :desc) do
+    case WorkerManager.pop(EncoderManager, sort_by: &{not &1.is_jxl, &1.id}, order: :asc) do
       :empty ->
         if state.active do
           # Status.put(state.id, "Idle")

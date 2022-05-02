@@ -30,6 +30,7 @@ defmodule LiveBooruWeb.QueueLive do
 
     Repo.all(EncodeJob)
     |> Repo.preload(:user)
+    |> Enum.sort_by(& &1.id)
     |> Enum.map(&{&1, &1.id in working})
   end
 

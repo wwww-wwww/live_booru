@@ -47,7 +47,6 @@ defmodule LiveBooruWeb.IndexLive do
   end
 
   def handle_params(params, session, socket) do
-    IO.inspect(params)
     {:ok, socket} = mount(params, session, socket)
     {:noreply, socket}
   end
