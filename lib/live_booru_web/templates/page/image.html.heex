@@ -1,3 +1,9 @@
+<%= if !is_nil(@image.title) and String.length(@image.title) > 0 do %>
+  <meta property="og:title" content={@image.title} %>
+<% end %>
+
+<meta property="og:image" content={"/thumb/#{Path.basename(@image.thumb)}"} />
+
 <div class="middle">
 
 <div class="sidebar">
