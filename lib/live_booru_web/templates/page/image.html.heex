@@ -96,7 +96,29 @@
     <% end %>
   </li>
   <li>
-    <a>Add to collection</a>
+    <%= if not @collections_edit do %>
+      <a phx-click="collections_edit">Add to collection</a>
+    <% else %>
+      <a phx-click="collections_edit_stop">Close</a>
+
+      <ul>
+        <%= for {_, collection} <- @user_collections |> Enum.sort_by(&elem(&1, 0)) do %>
+          <li>
+            <form phx-change="collection_change">
+              <input type="hidden" name="collection" value={collection.id} />
+              <label for="collection_#{collection.id}"><%= collection.name %></label>
+              <input type="checkbox" id="collection_#{collection.id}" name="checked" checked={collection.id in Map.keys(@collections_ids)}>
+            </form>
+          </li>
+        <% end %>
+        <li>
+          <form phx-submit="collection_create">
+            <input name="name">
+            <%= submit("Create") %>
+          </form>
+        </li>
+      </ul>
+    <% end %>
   </li>
 </ul>
 
@@ -158,7 +180,7 @@
 
 <h3>Collections</h3>
 <div>
-  <%= for collection <- @image.collections do %>
+  <%= for collection <- @collections do %>
   <div class="collection">
     <%= for image <- collection.images do %>
     <%= image(@socket, assigns, image) %>

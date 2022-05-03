@@ -183,18 +183,7 @@ defmodule LiveBooru.Repo do
     |> Repo.one()
   end
 
-  def create_favorites(%User{} = user) do
-    %Collection{}
-    |> Ecto.Changeset.change(%{type: :favorites})
-    |> Ecto.Changeset.put_assoc(:user, user)
-    |> Repo.insert()
-    |> case do
-      {:ok, collection} -> collection
-      err -> err
-    end
-  end
-
-  def add_favorites(collection, image) do
+  def add_collection(collection, image) do
     ImagesCollections.new(collection, image)
     |> Repo.insert()
   end
@@ -219,5 +208,34 @@ defmodule LiveBooru.Repo do
       where: c.type == :favorites and ic.image_id == ^image_id
     )
     |> Repo.aggregate(:count)
+  end
+
+  def get_collections(%{id: user_id}, %{id: image_id}) do
+    from(ic in ImagesCollections,
+      join: c in Collection,
+      on: c.id == ic.collection_id,
+      where: c.user_id == ^user_id and ic.image_id == ^image_id,
+      select: {c.id, ic}
+    )
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  def get_collections(%User{id: user_id}) do
+    from(c in Collection,
+      where: c.user_id == ^user_id,
+      order_by: [asc: c.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  def get_collections(%Image{id: image_id}) do
+    from(ic in ImagesCollections,
+      join: c in Collection,
+      on: c.id == ic.collection_id,
+      where: c.type != :favorites and ic.image_id == ^image_id,
+      select: c
+    )
+    |> Repo.all()
   end
 end

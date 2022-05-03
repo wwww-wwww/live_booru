@@ -391,7 +391,15 @@ button {
     h3:not(:first-child) {
       margin-top: 1em;
     }
+  }
+}
 
+.SignUpLive,
+.SignInLive,
+.UploadLive,
+.ImageEditLive,
+.TagLive {
+  .content {
     form {
       display: flex;
       flex-direction: column;
@@ -520,6 +528,10 @@ main {
   a:hover {
     text-decoration: underline;
   }
+}
+
+span > form {
+  display: inline-flex;
 }
 
 .taglist,

@@ -12,6 +12,7 @@ defmodule LiveBooruWeb.UserLive do
 
   def mount(%{"id" => id}, _, socket) do
     Repo.get(User, id)
+    |> Repo.preload(collections: :images)
     |> case do
       nil ->
         {:ok,
@@ -60,6 +61,24 @@ defmodule LiveBooruWeb.UserLive do
   def handle_info(params, session, socket) do
     {:ok, socket} = mount(params, session, socket)
     {:noreply, socket}
+  end
+
+  def handle_event("delete_collection", _, %{assigns: %{current_user: nil}} = socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("delete_collection", %{"value" => id}, socket) do
+    if socket.assigns.user.id == socket.assigns.current_user.id do
+      Repo.get(Collection, id)
+      |> Repo.delete()
+    end
+
+    {:noreply,
+     assign(
+       socket,
+       :user,
+       Repo.get(User, socket.assigns.user.id) |> Repo.preload(collections: :images)
+     )}
   end
 end
 

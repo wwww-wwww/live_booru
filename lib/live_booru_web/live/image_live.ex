@@ -10,7 +10,7 @@ defmodule LiveBooruWeb.ImageLive do
 
   def mount(%{"id" => id}, _session, socket) do
     Repo.get(Image, id)
-    |> Repo.preload([[collections: :images], :tags, :user, :votes, [comments: [:user, :votes]]])
+    |> Repo.preload([:tags, :user, :votes, [comments: [:user, :votes]]])
     |> case do
       nil ->
         {:ok,
@@ -55,6 +55,10 @@ defmodule LiveBooruWeb.ImageLive do
 
         favorites = Repo.count_favorites(image)
 
+        collections =
+          Repo.get_collections(image)
+          |> Repo.preload(:images)
+
         socket =
           socket
           |> assign(:topic, topic)
@@ -69,6 +73,8 @@ defmodule LiveBooruWeb.ImageLive do
           |> assign(:score, LiveBooruWeb.PageView.score(image))
           |> assign(:favorite, favorite)
           |> assign(:favorites, favorites)
+          |> assign(:collections, collections)
+          |> assign(:collections_edit, false)
 
         {:ok, socket}
     end
@@ -98,6 +104,10 @@ defmodule LiveBooruWeb.ImageLive do
   def handle_info(%{event: "comment_update", payload: comment}, socket) do
     send_update(LiveBooruWeb.CommentComponent, id: "comment_#{comment.id}", comment: comment)
     {:noreply, assign(socket, :comments, Map.put(socket.assigns.comments, comment.id, comment))}
+  end
+
+  def handle_event("vote_" <> _, _, %{assigns: %{current_user: nil}} = socket) do
+    {:noreply, socket}
   end
 
   def handle_event("vote_up", _, socket) do
@@ -138,6 +148,10 @@ defmodule LiveBooruWeb.ImageLive do
       {:error, cs} ->
         {:noreply, put_flash(socket, :error, inspect(cs))}
     end
+  end
+
+  def handle_event("comment_" <> _, _, %{assigns: %{current_user: nil}} = socket) do
+    {:noreply, socket}
   end
 
   def handle_event("comment_reply", %{"value" => comment}, socket) do
@@ -199,7 +213,7 @@ defmodule LiveBooruWeb.ImageLive do
     end
   end
 
-  def handle_event("favorites_add", _, %{assigns: %{current_user: nil}} = socket) do
+  def handle_event("favorites_" <> _, _, %{assigns: %{current_user: nil}} = socket) do
     {:noreply, socket}
   end
 
@@ -207,21 +221,15 @@ defmodule LiveBooruWeb.ImageLive do
     socket =
       case Repo.get_favorites(current_user) do
         nil ->
-          Repo.create_favorites(current_user)
+          LiveBooru.Collection.new(current_user, %{name: "Favorites", type: :favorites})
 
         favorites ->
-          favorites
+          {:ok, favorites}
       end
       |> case do
-        {:error, _err} ->
-          socket
-
-        collection ->
-          Repo.add_favorites(collection, socket.assigns.image)
+        {:ok, collection} ->
+          Repo.add_collection(collection, socket.assigns.image)
           |> case do
-            {:error, _err} ->
-              socket
-
             {:ok, favorite} ->
               Endpoint.broadcast(
                 "image:#{socket.assigns.image.id}",
@@ -230,7 +238,13 @@ defmodule LiveBooruWeb.ImageLive do
               )
 
               assign(socket, :favorite, favorite)
+
+            {:error, _err} ->
+              socket
           end
+
+        {:error, _err} ->
+          socket
       end
 
     {:noreply, socket}
@@ -238,7 +252,7 @@ defmodule LiveBooruWeb.ImageLive do
 
   def handle_event("favorites_remove", _, socket) do
     if socket.assigns.favorite != nil do
-      Repo.delete(socket.assigns.favorite)
+      Repo.delete(socket.assigns.favorite, stale_error_field: :stale)
 
       Endpoint.broadcast(
         "image:#{socket.assigns.image.id}",
@@ -248,6 +262,106 @@ defmodule LiveBooruWeb.ImageLive do
     end
 
     {:noreply, assign(socket, :favorite, nil)}
+  end
+
+  def handle_event("collections_" <> _, _, %{assigns: %{current_user: nil}} = socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("collections_edit", _, socket) do
+    socket =
+      socket
+      |> assign(:collections_edit, true)
+      |> assign(
+        :user_collections,
+        Enum.map(Repo.get_collections(socket.assigns.current_user), &{to_string(&1.id), &1})
+        |> Map.new()
+      )
+      |> assign(
+        :collections_ids,
+        Repo.get_collections(socket.assigns.current_user, socket.assigns.image)
+      )
+
+    {:noreply, assign(socket, :collections_edit, true)}
+  end
+
+  def handle_event("collections_edit_stop", _, socket) do
+    {:noreply, assign(socket, :collections_edit, false)}
+  end
+
+  def handle_event(
+        "collection_change",
+        %{"checked" => "on", "collection" => collection_id},
+        socket
+      ) do
+    socket =
+      if collection = Map.get(socket.assigns.user_collections, collection_id) do
+        Repo.add_collection(collection, socket.assigns.image)
+        |> case do
+          {:ok, ic} ->
+            socket
+            |> assign(
+              :collections_ids,
+              Map.put(socket.assigns.collections_ids, ic.collection_id, ic)
+            )
+
+          _ ->
+            socket
+        end
+      else
+        socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("collection_change", %{"collection" => collection_id}, socket) do
+    {collection_id, _} = Integer.parse(collection_id)
+
+    if ic = Map.get(socket.assigns.collections_ids, collection_id),
+      do: Repo.delete(ic, stale_error_field: :stale)
+
+    socket =
+      socket
+      |> assign(
+        :collections_ids,
+        Repo.get_collections(socket.assigns.current_user, socket.assigns.image)
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("collection_create", %{"name" => name}, socket) do
+    socket =
+      LiveBooru.Collection.new(socket.assigns.current_user, %{name: name})
+      |> case do
+        {:ok, collection} ->
+          Repo.add_collection(collection, socket.assigns.image)
+          |> case do
+            {:ok, ic} ->
+              socket
+              |> assign(
+                :collections_ids,
+                Map.put(socket.assigns.collections_ids, ic.collection_id, ic)
+              )
+              |> assign(
+                :user_collections,
+                Map.put(socket.assigns.user_collections, collection.id, collection)
+              )
+
+            _ ->
+              socket
+              |> assign(
+                :user_collections,
+                Map.put(socket.assigns.user_collections, collection.id, collection)
+              )
+          end
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
   end
 end
 

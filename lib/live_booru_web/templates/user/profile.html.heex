@@ -31,4 +31,27 @@
 </table>
 </div>
 
+<h2>Collections</h2>
+
+<div>
+  <%= for collection <- @user.collections do %>
+    <div>
+      <h3>
+        <span>
+          <%= collection.name %>
+          <%= if !is_nil(@current_user) and @current_user.id == @user.id do %>
+            <button phx-click="delete_collection" value={collection.id}>Delete</button>
+          <% end %>
+        </span>
+      </h3>
+      <div>Type: <%= collection.type %></div>
+      <div>
+        <%= for image <- collection.images do %>
+          <%= image(@socket, assigns, image) %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
 </div>
