@@ -32,12 +32,18 @@ defmodule LiveBooru.AutoTag do
       |> String.split("\n")
       |> Enum.any?(&(String.trim(&1) == "num_color_channels: 1"))
 
+    animation =
+      jxlinfo
+      |> String.split("\n")
+      |> Enum.any?(&(String.trim(&1) == "have_animation: 1"))
+
     {w, h} = dimensions(jxlinfo)
     mp = w * h
 
     tags
     |> append_if(alpha, "Alpha Transparency")
     |> append_if(grayscale, "Grayscale")
+    |> append_if(animation, "Animation")
     |> append_if(mp > 1_900_000, "High Resolution")
     |> append_if(mp > 6_000_000, "Absurd Resolution")
     |> Enum.uniq()
