@@ -40,6 +40,19 @@ defmodule LiveBooruWeb.CommentsLive do
     {:noreply, assign(socket, comments: get_comments())}
   end
 
+  def handle_event("comment_reply", %{"value" => comment_id}, socket) do
+    case Repo.get(Comment, comment_id) do
+      nil ->
+        {:noreply, socket}
+
+      %{image_id: image_id} ->
+        socket =
+          push_redirect(socket, to: Routes.live_path(socket, LiveBooruWeb.ImageLive, image_id))
+
+        {:noreply, socket}
+    end
+  end
+
   def get_comments() do
     query =
       from c in Comment,
