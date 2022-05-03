@@ -1,0 +1,20 @@
+<div class="content">
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>User</th>
+    <th>Tag</th>
+    <th>Description</th>
+  </tr>
+  <%= for change <- @changes do %>
+    <tr>
+      <td><%= Timex.from_now(change.inserted_at) %></td>
+      <td><%= change.user.name %></td>
+      <td><%= live_redirect(change.tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, change.tag_id)) %></td>
+      <td><%= change.description %></td>
+    </tr>
+  <% end %>
+</table>
+
+</div>

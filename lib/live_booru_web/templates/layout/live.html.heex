@@ -3,9 +3,13 @@
     <div>
       <%= nav_link @socket, "Index", LiveBooruWeb.IndexLive %>
       <%= nav_link @socket, "Comments", LiveBooruWeb.CommentsLive %>
+      <%= if LiveBooru.Accounts.admin?(@current_user) do %>
+        <%= nav_link @socket, "Tag Changes", LiveBooruWeb.AllTagChangesLive %>
+        <%= nav_link @socket, "Image Changes", LiveBooruWeb.AllImageChangesLive %>
+      <% end %>
       <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
       <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
-      <%= if assigns.current_user do %>
+      <%= if @current_user do %>
       <%= nav_link (assigns[:socket] || assigns[:conn]), "Upload", LiveBooruWeb.UploadLive %>
       <% end %>
       <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>

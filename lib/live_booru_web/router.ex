@@ -24,17 +24,29 @@ defmodule LiveBooruWeb.Router do
       live "/", IndexLive
       live "/queue", QueueLive
       live "/comments", CommentsLive
-      live "/image/:id/more", ImageMoreLive
-      live "/image/:id/changes", ImageChangesLive
-      live "/image/:id", ImageLive
-
-      live "/tag/id/:id", TagLive
-      live "/tag/name/:name", TagLive
-
-      live "/tag/id/:id/changes", TagChangesLive
-      live "/tag/name/:name/changes", TagChangesLive
 
       live "/tags", TagListLive
+
+      scope "/image" do
+        live "/:id/more", ImageMoreLive
+        live "/:id/changes", ImageChangesLive
+        live "/:id", ImageLive
+      end
+
+      scope "/tag" do
+        live "/id/:id", TagLive
+        live "/name/:name", TagLive
+
+        live "/id/:id/changes", TagChangesLive
+        live "/name/:name/changes", TagChangesLive
+      end
+
+      scope "/" do
+        pipe_through :require_admin
+
+        live "/tag_changes", AllTagChangesLive
+        live "/image_changes", AllImageChangesLive
+      end
 
       scope "/" do
         pipe_through :require_authenticated_user

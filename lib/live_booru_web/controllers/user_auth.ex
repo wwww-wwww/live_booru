@@ -150,6 +150,17 @@ defmodule LiveBooruWeb.UserAuth do
     end
   end
 
+  def require_admin(conn, _opts) do
+    if conn.assigns.current_user.level >= 100 do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You are not allowed to access this page.")
+      |> redirect(to: "/")
+      |> halt()
+    end
+  end
+
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     put_session(conn, :user_return_to, current_path(conn))
   end

@@ -8,7 +8,7 @@ defmodule LiveBooruWeb.CommentsLive do
   @topic "comments"
 
   def render(assigns) do
-    LiveBooruWeb.PageView.render("comments_live.html", assigns)
+    LiveBooruWeb.PageView.render("comments.html", assigns)
   end
 
   def mount(_params, _session, socket) do

@@ -1,0 +1,22 @@
+<div class="content">
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Image</th>
+    <th>User</th>
+    <th>Tags</th>
+    <th>Source</th>
+  </tr>
+  <%= for change <- @changes do %>
+    <tr>
+      <td><%= Timex.from_now(change.inserted_at) %></td>
+      <td><%= live_redirect(change.image_id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, change.image_id)) %></td>
+      <td><%= change.user.name %></td>
+      <td><%= Enum.join(change.tags, ", ") %></td>
+      <td><%= change.source %></td>
+    </tr>
+  <% end %>
+</table>
+
+</div>
