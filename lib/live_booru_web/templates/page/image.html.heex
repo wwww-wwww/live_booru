@@ -65,6 +65,7 @@
   <li>Title: <%= @image.title %></li>
   <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_redirect("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
   <li>Source: <%= @source %></li>
+  <li>Content Rating: <%= rating(@image) %></li>
   <li class="score">
     Score:
     <%= if assigns.current_user do %>
@@ -77,16 +78,36 @@
       <%= submit("thumb_down", phx_click: "vote_down", class: "icon down#{highlight}") %>
     <% end %>
   </li>
-  <li>Content Rating: <%= rating(@image) %></li>
+  <li class="favorites">Favorites: <%= @favorites %></li>
 </ul>
 
-<%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
+<h3>Options</h3>
+<ul>
+  <%= if assigns.current_user do %>
+    <li>
+      <%= live_redirect("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
+    </li>
+  <% end %>
+  <li>
+    <%= if is_nil(@favorite) do %>
+      <a phx-click="favorites_add">Add to favorites</a>
+    <% else %>
+      <a phx-click="favorites_remove">Remove from favorites</a>
+    <% end %>
+  </li>
+  <li>
+    <a>Add to collection</a>
+  </li>
+</ul>
 
-<%= if assigns.current_user do %>
-<%= live_redirect("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
-<% end %>
+<h3>History</h3>
+<ul>
+  <li>
+    <%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
+  </li>
+</ul>
 
-</div>
+</div> <%# sidebar %>
 
 <div class="content">
 

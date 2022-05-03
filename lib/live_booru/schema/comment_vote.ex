@@ -18,6 +18,7 @@ defmodule LiveBooru.CommentVote do
     |> put_assoc(:user, user)
     |> put_assoc(:comment, comment)
     |> validate_required([:upvote, :user, :comment])
+    |> unique_constraint([:comment_id, :user_id])
   end
 
   def add(user, comment, up) do

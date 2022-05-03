@@ -2,7 +2,7 @@ defmodule LiveBooruWeb.UserLive do
   use LiveBooruWeb, :live_view
 
   alias LiveBooru.Accounts.User
-  alias LiveBooru.{Repo, Image, Comment, ImageChange, TagChange}
+  alias LiveBooru.{Repo, Image, Comment, ImageChange, TagChange, Collection, ImagesCollections}
 
   import Ecto.Query, only: [from: 2]
 
@@ -36,6 +36,14 @@ defmodule LiveBooruWeb.UserLive do
           from(c in TagChange, where: c.user_id == ^user_id)
           |> Repo.aggregate(:count)
 
+        n_favorites =
+          from(ic in ImagesCollections,
+            join: c in Collection,
+            on: c.id == ic.collection_id,
+            where: c.user_id == ^user_id
+          )
+          |> Repo.aggregate(:count)
+
         socket =
           socket
           |> assign(user: user)
@@ -43,6 +51,7 @@ defmodule LiveBooruWeb.UserLive do
           |> assign(n_comments: n_comments)
           |> assign(n_image_changes: n_image_changes)
           |> assign(n_tag_changes: n_tag_changes)
+          |> assign(n_favorites: n_favorites)
 
         {:ok, socket}
     end

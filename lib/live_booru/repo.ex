@@ -5,7 +5,8 @@ defmodule LiveBooru.Repo do
 
   @limit 40
 
-  alias LiveBooru.{Repo, ImagesTags, Tag, Image}
+  alias LiveBooru.Accounts.User
+  alias LiveBooru.{Repo, ImagesTags, Tag, Image, Collection, ImagesCollections}
 
   import Ecto.Query, only: [from: 1, from: 2, limit: 2, offset: 2, order_by: 2]
 
@@ -171,5 +172,52 @@ defmodule LiveBooru.Repo do
         where: (ilike(t.name, ^name) and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)
 
     Repo.one(query)
+  end
+
+  def get_favorites(%{id: user_id}) do
+    from(c in Collection,
+      where: c.user_id == ^user_id and c.type == :favorites,
+      order_by: [asc: c.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  def create_favorites(%User{} = user) do
+    %Collection{}
+    |> Ecto.Changeset.change(%{type: :favorites})
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Repo.insert()
+    |> case do
+      {:ok, collection} -> collection
+      err -> err
+    end
+  end
+
+  def add_favorites(collection, image) do
+    ImagesCollections.new(collection, image)
+    |> Repo.insert()
+  end
+
+  def get_favorite(nil, _), do: nil
+
+  def get_favorite(%{id: user_id}, %{id: image_id}) do
+    from(ic in ImagesCollections,
+      join: c in Collection,
+      on: c.id == ic.collection_id,
+      where: c.user_id == ^user_id and ic.image_id == ^image_id and c.type == :favorites,
+      order_by: [asc: c.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  def count_favorites(%{id: image_id}) do
+    from(ic in ImagesCollections,
+      join: c in Collection,
+      on: c.id == ic.collection_id,
+      where: c.type == :favorites and ic.image_id == ^image_id
+    )
+    |> Repo.aggregate(:count)
   end
 end

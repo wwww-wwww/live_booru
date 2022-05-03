@@ -1,7 +1,7 @@
 defmodule LiveBooru.ImagesCollections do
   use Ecto.Schema
+  import Ecto.Changeset
 
-  @primary_key false
   schema "images_collections" do
     belongs_to :image, LiveBooru.Image
     belongs_to :collection, LiveBooru.Collection
@@ -9,9 +9,11 @@ defmodule LiveBooru.ImagesCollections do
     timestamps()
   end
 
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> Ecto.Changeset.cast(params, [:image_id, :collection_id])
-    |> Ecto.Changeset.validate_required([:image_id, :collection_id])
+  def new(collection, image) do
+    %__MODULE__{}
+    |> change()
+    |> put_assoc(:collection, collection)
+    |> put_assoc(:image, image)
+    |> unique_constraint([:image_id, :collection_id])
   end
 end

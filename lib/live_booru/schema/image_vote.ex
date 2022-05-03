@@ -19,6 +19,7 @@ defmodule LiveBooru.ImageVote do
     |> put_assoc(:user, user)
     |> put_assoc(:image, image)
     |> validate_required([:upvote, :user, :image])
+    |> unique_constraint([:image_id, :user_id])
   end
 
   def add(user, image, up) do

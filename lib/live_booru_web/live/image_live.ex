@@ -51,6 +51,10 @@ defmodule LiveBooruWeb.ImageLive do
             _ -> live_redirect(image.source, to: image.source)
           end
 
+        favorite = Repo.get_favorite(socket.assigns.current_user, image)
+
+        favorites = Repo.count_favorites(image)
+
         socket =
           socket
           |> assign(:topic, topic)
@@ -62,6 +66,8 @@ defmodule LiveBooruWeb.ImageLive do
           |> assign(:editing, true)
           |> assign(:preview, nil)
           |> assign(:comments, comments)
+          |> assign(:favorite, favorite)
+          |> assign(:favorites, favorites)
 
         {:ok, socket}
     end
@@ -74,6 +80,10 @@ defmodule LiveBooruWeb.ImageLive do
 
   def handle_info(%{event: "score", payload: score}, socket) do
     {:noreply, assign(socket, score: score)}
+  end
+
+  def handle_info(%{event: "favorites", payload: favorites}, socket) do
+    {:noreply, assign(socket, favorites: favorites)}
   end
 
   def handle_info(%{event: "comment", payload: comment}, socket) do
@@ -178,6 +188,57 @@ defmodule LiveBooruWeb.ImageLive do
             {:noreply, put_flash(socket, :comment_error, inspect(cs))}
         end
     end
+  end
+
+  def handle_event("favorites_add", _, %{assigns: %{current_user: nil}} = socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("favorites_add", _, %{assigns: %{current_user: current_user}} = socket) do
+    socket =
+      case Repo.get_favorites(current_user) do
+        nil ->
+          Repo.create_favorites(current_user)
+
+        favorites ->
+          favorites
+      end
+      |> case do
+        {:error, _err} ->
+          socket
+
+        collection ->
+          Repo.add_favorites(collection, socket.assigns.image)
+          |> case do
+            {:error, _err} ->
+              socket
+
+            {:ok, favorite} ->
+              Endpoint.broadcast(
+                "image:#{socket.assigns.image.id}",
+                "favorites",
+                Repo.count_favorites(socket.assigns.image)
+              )
+
+              assign(socket, :favorite, favorite)
+          end
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("favorites_remove", _, socket) do
+    if socket.assigns.favorite != nil do
+      Repo.delete(socket.assigns.favorite)
+
+      Endpoint.broadcast(
+        "image:#{socket.assigns.image.id}",
+        "favorites",
+        Repo.count_favorites(socket.assigns.image)
+      )
+    end
+
+    {:noreply, assign(socket, :favorite, nil)}
   end
 end
 

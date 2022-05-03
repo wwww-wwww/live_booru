@@ -507,11 +507,25 @@ main {
   }
 }
 
+.sidebar {
+  li {
+    font-size: 0.9rem;
+  }
+
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
 .taglist,
 .tags {
   li {
     gap: 0.25em;
-    font-size: 0.9rem;
 
     > * {
       padding: 0 0.125em;
