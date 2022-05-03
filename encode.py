@@ -17,54 +17,30 @@ def has_no_alpha(im):
   return im.getextrema()[-1][0] == 255
 
 
-def encode(file):
-  p = subprocess.run(cjxl_args + [file, file + ".jxl"], capture_output=True)
+def encode(file, out, extra_args):
+  p = subprocess.run(cjxl_args + extra_args + [file, out + ".jxl"],
+                     capture_output=True)
   if p.returncode != 0: exit(1)
-  return file + ".jxl"
+  return out + ".jxl"
 
 
 def main():
-  inputs = [sys.argv[1]]
+  inputs = [(sys.argv[1], sys.argv[1], [])]
 
   im = Image.open(sys.argv[1])
-  if im.mode == "RGB":
-    if is_gray(im):
-      im.convert("L").save(sys.argv[1] + "_L.png")
-      inputs.append(sys.argv[1] + "_L.png")
-
-  if im.mode == "RGBA":
-    if has_no_alpha(im) and is_gray(im):
-      im.convert("L").save(sys.argv[1] + "_L.png")
-      inputs.append(sys.argv[1] + "_L.png")
-
-    elif has_no_alpha(im):
-      im.convert("RGB").save(sys.argv[1] + "_RGB.png")
-      inputs.append(sys.argv[1] + "_RGB.png")
-
-    elif is_gray(im):
-      im.convert("LA").save(sys.argv[1] + "_LA.png")
-      inputs.append(sys.argv[1] + "_LA.png")
-
-  if im.mode == "LA":
-    if has_no_alpha(im):
-      im.convert("L").save(sys.argv[1] + "_L.png")
-      inputs.append(sys.argv[1] + "_L.png")
-
-  if im.format != "PNG":
-    im.save(sys.argv[1] + ".png")
-    inputs.append(sys.argv[1] + ".png")
+  if im.format == "JPEG":
+    inputs.append((sys.argv[1], sys.argv[1] + ".j", ["-j"]))
 
   outputs = []
   for file in inputs:
-    outputs.append(encode(file))
+    outputs.append((encode(*file), file[2]))
 
-  outputs.sort(key=lambda f: os.path.getsize(f))
-  shutil.copyfile(outputs[0], sys.argv[2])
+  outputs.sort(key=lambda f: os.path.getsize(f[0]))
+  shutil.copyfile(outputs[0][0], sys.argv[2])
 
   while True:
     try:
-      [os.remove(f) for f in inputs[1:] if os.path.exists(f)]
-      [os.remove(f) for f in outputs if os.path.exists(f)]
+      [os.remove(f[0]) for f in outputs if os.path.exists(f[0])]
       break
     except:
       time.sleep(0.5)
@@ -74,7 +50,7 @@ def main():
                      universal_newlines=True)
 
   print(p.stdout.split("\n")[0])
-  print(" ".join(cjxl_args))
+  print(" ".join(cjxl_args + outputs[0][1]))
 
 
 if __name__ == "__main__":

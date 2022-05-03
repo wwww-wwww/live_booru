@@ -1,5 +1,5 @@
 defmodule LiveBooru.AutoTag do
-  @re_dimensions ~r/^dimensions: *([0-9]+)?x([0-9]+)/m
+  @re_dimensions ~r/^JPEG XL .+?, ([0-9]+?)x([0-9]+?),/m
 
   def dimensions(jxlinfo) do
     Regex.run(@re_dimensions, jxlinfo)

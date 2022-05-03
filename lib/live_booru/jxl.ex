@@ -18,7 +18,7 @@ defmodule LiveBooru.Jxl do
   end
 
   def info(path) do
-    case System.cmd("jxlinfo", [path]) do
+    case System.cmd("jxlinfo", ["-v", path]) do
       {output, 0} -> output
       _ -> nil
     end
