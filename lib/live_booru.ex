@@ -30,7 +30,10 @@ defmodule LiveBooru do
 
   def jxlinfo() do
     Repo.all(Image)
-    |> Enum.map(& &1.info)
+    |> Enum.map(fn image ->
+      Ecto.Changeset.change(image, %{info: LiveBooru.Jxl.info(image.path)})
+      |> Repo.update()
+    end)
   end
 
   def add_dimensions() do

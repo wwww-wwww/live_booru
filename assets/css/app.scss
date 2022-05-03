@@ -280,6 +280,41 @@ nav {
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+
+    > .image {
+      display: flex;
+      gap: 0.5em;
+
+      > .left img {
+        max-width: 200px;
+        max-height: 400px;
+      }
+
+      .right {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        flex: 1;
+
+        > .info > :not(.tags) {
+          gap: 1em;
+        }
+
+        > .info > div {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0 0.5em;
+        }
+
+        .comments {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5em;
+          border-left: 3px solid lightgray;
+          border-radius: 0.25rem;
+        }
+      }
+    }
   }
 }
 
@@ -471,15 +506,11 @@ main {
   }
 }
 
-.taglist {
+.taglist,
+.tags {
   li {
     gap: 0.25em;
     font-size: 0.9rem;
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
 
     > * {
       padding: 0 0.125em;
@@ -494,27 +525,38 @@ main {
     }
   }
 
-  li.meta {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  li.meta,
+  > a.meta {
     color: #33ccad;
   }
 
-  li.meta_system {
+  li.meta_system,
+  > a.meta_system {
     color: #33ccad;
   }
 
-  li.copyright {
+  li.copyright,
+  > a.copyright {
     color: #77ca24;
   }
 
-  li.character {
+  li.character,
+  > a.character {
     color: #c5902f;
   }
 
-  li.general {
+  li.general,
+  > a.general {
     color: #9d35e6;
   }
 
-  li.artist {
+  li.artist,
+  > a.artist {
     color: #e75744;
   }
 }

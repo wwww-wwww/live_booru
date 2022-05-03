@@ -119,4 +119,14 @@ defmodule LiveBooruWeb.PageView do
       end
     ]
   end
+
+  def score(image), do: Enum.reduce(image.votes, 0, &if(&1.upvote, do: &2 + 1, else: &2 - 1))
+
+  def rating(image) do
+    cond do
+      Enum.any?(image.tags, &(&1.name == "NSFW")) -> "NSFW"
+      Enum.any?(image.tags, &(&1.name == "Suggestive")) -> "Suggestive"
+      true -> "Safe"
+    end
+  end
 end

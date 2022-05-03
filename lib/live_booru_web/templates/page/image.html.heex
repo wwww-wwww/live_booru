@@ -71,19 +71,13 @@
       <% highlight = if @self_vote == true, do: " highlight", else: "" %>
       <%= submit("thumb_up", phx_click: "vote_up", class: "icon up#{highlight}") %>
     <% end %>
-    <%= @score %>
+    <%= score(@image) %>
     <%= if assigns.current_user do %>
       <% highlight = if @self_vote == false, do: " highlight", else: "" %>
       <%= submit("thumb_down", phx_click: "vote_down", class: "icon down#{highlight}") %>
     <% end %>
   </li>
-  <li>Content Rating:
-  <%= cond do %>
-  <% Enum.any?(@image.tags, & &1.name == "NSFW") -> %>NSFW
-  <% Enum.any?(@image.tags, & &1.name == "Suggestive") -> %>Suggestive
-  <% true -> %>Safe
-  <% end %>
-  </li>
+  <li>Content Rating: <%= rating(@image) %></li>
 </ul>
 
 <%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>

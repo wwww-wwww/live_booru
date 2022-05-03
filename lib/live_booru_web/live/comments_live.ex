@@ -26,10 +26,13 @@ defmodule LiveBooruWeb.CommentsLive do
   end
 
   def get_comments() do
-    query = from c in Comment, order_by: [desc: c.inserted_at]
+    query =
+      from c in Comment,
+        order_by: [desc: c.inserted_at]
 
     Repo.all(query)
-    |> Repo.preload([:user, [votes: :user]])
+    |> Repo.preload([:user, [votes: :user], [image: [:user, :votes, :tags]]])
+    |> Enum.chunk_by(& &1.image_id)
   end
 
   def update() do

@@ -22,8 +22,6 @@ defmodule LiveBooruWeb.ImageLive do
         topic = "image:#{image.id}"
         if connected?(socket), do: LiveBooruWeb.Endpoint.subscribe(topic)
 
-        score = image.votes |> Enum.reduce(0, &if(&1.upvote, do: &2 + 1, else: &2 - 1))
-
         tags =
           image.tags
           |> Repo.count_tags()
@@ -59,7 +57,6 @@ defmodule LiveBooruWeb.ImageLive do
           |> assign(:image, image)
           |> assign(:source, source)
           |> assign(:tags, tags)
-          |> assign(:score, score)
           |> assign(:self_vote, self_vote)
           |> assign(:current_comment, "")
           |> assign(:editing, true)
