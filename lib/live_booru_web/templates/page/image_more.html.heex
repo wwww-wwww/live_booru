@@ -4,7 +4,7 @@
 <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}")) %>
 
 <table>
-  <tr><td>Image</td><td><%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></td></tr>
+  <tr><td>Image</td><td><%= live_redirect(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></td></tr>
   <tr><td>MD5</td><td><%= @image.hash %></td></tr>
   <tr><td>Pixels MD5</td><td><%= @image.pixels_hash %></td></tr>
   <tr><td>Thumbnail Pixels MD5</td><td><%= @image.thumb_hash %></td></tr>

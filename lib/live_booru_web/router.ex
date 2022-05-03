@@ -24,8 +24,9 @@ defmodule LiveBooruWeb.Router do
       live "/", IndexLive
       live "/queue", QueueLive
       live "/comments", CommentsLive
-
       live "/tags", TagListLive
+
+      live "/user/:id", UserLive
 
       scope "/image" do
         live "/:id/more", ImageMoreLive

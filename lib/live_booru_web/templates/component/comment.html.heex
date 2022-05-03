@@ -1,14 +1,14 @@
 <div class="comment" id={"comment_#{@comment.id}"}>
   <div class="header">
     <div>
-      <span><%= @comment.user.name %></span>
+      <span><%= live_redirect(@comment.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, @comment.user_id)) %></span>
     </div>
     <div>
       <%= Timex.from_now(@comment.inserted_at) %>
       <%= if @socket.view == LiveBooruWeb.ImageLive do %>
         <%= link("##{@comment.id}", to: "#comment_#{@comment.id}") %>
       <% else %>
-        <%= live_redirect("##{@comment.id}", to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @comment.image_id) <> "#comment_#{@comment.id}") %>
+        <%= live_patch("##{@comment.id}", to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @comment.image_id) <> "#comment_#{@comment.id}") %>
       <% end %>
     </div>
   </div>

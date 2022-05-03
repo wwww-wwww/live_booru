@@ -23,7 +23,7 @@
 </.form>
 
 <p>
-  <%= live_patch("Log In", to: Routes.live_path(@socket, LiveBooruWeb.SignInLive)) %>
+  <%= live_redirect("Log In", to: Routes.live_path(@socket, LiveBooruWeb.SignInLive)) %>
 </p>
 
 </div>

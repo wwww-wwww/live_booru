@@ -1,6 +1,6 @@
 <div>
-  <%= if assigns.current_user do %>
-    <%= live_redirect("Settings", to: Routes.user_settings_path((assigns[:socket] || assigns[:conn]), :edit)) %>
+  <%= if @current_user do %>
+    <%= nav_link (assigns[:socket] || assigns[:conn]), @current_user.name, LiveBooruWeb.UserLive, @current_user.id %>
     <%= link "Log out", to: Routes.user_session_path((assigns[:socket] || assigns[:conn]), :delete), method: :delete %>
   <% else %>
     <%= nav_link (assigns[:socket] || assigns[:conn]), "Register", LiveBooruWeb.SignUpLive %>

@@ -10,7 +10,7 @@
   </form>
 <% else %>
   <h1>
-    <%= live_patch(@tag.name, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: quote_tag(@tag))) %>
+    <%= live_redirect(@tag.name, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: quote_tag(@tag))) %>
   </h1>
 <% end %>
 
@@ -89,6 +89,6 @@
   <% end %>
 <% end %>
 
-<%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.TagChangesLive, @tag.id)) %>
+<%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.TagChangesLive, @tag.id)) %>
 
 </div>

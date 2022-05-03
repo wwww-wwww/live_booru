@@ -5,9 +5,11 @@ defmodule LiveBooruWeb.LayoutView do
   # so we instruct Elixir to not warn if the dashboard route is missing.
   @compile {:no_warn_undefined, {Routes, :live_dashboard_path, 2}}
 
-  def nav_link(%{view: view} = socket, name, module) do
+  def nav_link(_, _, _, _ \\ [])
+
+  def nav_link(%{view: view} = socket, name, module, opts) do
     live_redirect(name,
-      to: Routes.live_path(socket, module),
+      to: Routes.live_path(socket, module, opts),
       class:
         if(view == module,
           do: "selected",
@@ -16,7 +18,7 @@ defmodule LiveBooruWeb.LayoutView do
     )
   end
 
-  def nav_link(conn, name, module) do
-    live_redirect(name, to: Routes.live_path(conn, module))
+  def nav_link(conn, name, module, opts) do
+    live_redirect(name, to: Routes.live_path(conn, module, opts))
   end
 end

@@ -20,7 +20,7 @@
 <% end %>
 
 <p>
-  <%= live_patch("Register", to: Routes.live_path(@socket, LiveBooruWeb.SignUpLive)) %>
+  <%= live_redirect("Register", to: Routes.live_path(@socket, LiveBooruWeb.SignUpLive)) %>
 </p>
 
 </div>

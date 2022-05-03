@@ -20,7 +20,7 @@
   <%= if i - 1 == current_page do %>
     <span><%= i %></span>
   <% else %>
-    <%= live_redirect(i,
+    <%= live_patch(i,
       to: Routes.live_path(
         @socket,
         LiveBooruWeb.IndexLive,
@@ -45,7 +45,7 @@
   <%= if i - 1 == current_page do %>
     <span><%= i %></span>
   <% else %>
-    <%= live_redirect(i,
+    <%= live_patch(i,
       to: Routes.live_path(
         @socket,
         LiveBooruWeb.IndexLive,

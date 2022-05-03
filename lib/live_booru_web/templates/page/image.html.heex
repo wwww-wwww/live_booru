@@ -61,9 +61,9 @@
 <ul>
   <li>ID: <%= @image.id %></li>
   <li>Date: <span><%= Timex.from_now(@image.inserted_at) %></span></li>
-  <li>Uploader: <%= @image.user.name %></li>
+  <li>Uploader: <%= live_redirect(@image.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, @image.user_id)) %></li>
   <li>Title: <%= @image.title %></li>
-  <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_patch("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
+  <li>Size: <%= Size.humanize!(@image.filesize) %> (<%= @image.width %>x<%= @image.height %>) <%= live_redirect("»", to: Routes.live_path(@socket, LiveBooruWeb.ImageMoreLive, @image.id)) %></li>
   <li>Source: <%= @source %></li>
   <li class="score">
     Score:
@@ -80,10 +80,10 @@
   <li>Content Rating: <%= rating(@image) %></li>
 </ul>
 
-<%= live_patch("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
+<%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
 
 <%= if assigns.current_user do %>
-<%= live_patch("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
+<%= live_redirect("Edit", to: Routes.live_path(@socket, LiveBooruWeb.ImageEditLive, @image.id)) %>
 <% end %>
 
 </div>

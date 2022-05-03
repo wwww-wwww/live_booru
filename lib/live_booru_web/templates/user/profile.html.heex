@@ -1,0 +1,30 @@
+<div class="content">
+
+<h1><%= @user.name %></h1>
+
+<div>
+<table>
+  <tr>
+    <td>Joined</td>
+    <td><%= @user.inserted_at %></td>
+  </tr>
+  <tr>
+    <td>Posts</td>
+    <td><%= @n_images %></td>
+  </tr>
+  <tr>
+    <td>Comments</td>
+    <td><%= @n_comments %></td>
+  </tr>
+  <tr>
+    <td>Tag Changes</td>
+    <td><%= @n_tag_changes %></td>
+  </tr>
+  <tr>
+    <td>Image Changes</td>
+    <td><%= @n_image_changes %></td>
+  </tr>
+</table>
+</div>
+
+</div>

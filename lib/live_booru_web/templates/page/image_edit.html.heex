@@ -1,6 +1,6 @@
 <div class="content">
 
-<h1>Editing <%= live_patch(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
+<h1>Editing <%= live_redirect(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
 
 <div>
   <%= img_tag(Routes.static_path(@socket, "/thumb/#{Path.basename(@image.thumb)}")) %>

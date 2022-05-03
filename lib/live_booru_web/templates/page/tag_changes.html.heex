@@ -1,6 +1,6 @@
 <div class="content">
 
-<h1>Changes for <%= live_patch(@tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, @tag.id)) %></h1>
+<h1>Changes for <%= live_redirect(@tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, @tag.id)) %></h1>
 
 <table>
   <tr>
@@ -11,7 +11,7 @@
   <%= for change <- @tag.changes do %>
   <tr>
     <td><%= change.inserted_at %></td>
-    <td><%= change.user.username %></td>
+    <td><%= live_redirect(change.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, change.user_id)) %></td>
     <td><%= change.description %></td>
   </tr>
 <% end %>
