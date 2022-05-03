@@ -86,7 +86,7 @@ defmodule LiveBooru.Repo do
       |> limit(@limit)
       |> Repo.all()
 
-    {results, %{count: count, pages: ceil(count / @limit), limit: @limit}}
+    {results, %{count: count, pages: max(ceil(count / @limit), 1), limit: @limit}}
   end
 
   def search(_, _ \\ [])

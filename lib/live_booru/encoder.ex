@@ -172,7 +172,7 @@ defmodule LiveBooru.Encoder do
     tags =
       tags
       |> LiveBooru.AutoTag.tag(jxlinfo, job, decoded)
-      |> Enum.map(fn tag_name ->
+      |> Stream.map(fn tag_name ->
         case Repo.get_tag(tag_name) do
           nil -> Tag.new(tag_name, :general)
           tag -> Ecto.Changeset.change(tag)
@@ -183,7 +183,9 @@ defmodule LiveBooru.Encoder do
           _ -> Repo.get_by(Tag, name: tag_name)
         end
       end)
-      |> Enum.filter(&(!is_nil(&1)))
+      |> Stream.filter(&(!is_nil(&1)))
+      |> Enum.map(&Tag.parents(&1))
+      |> List.flatten()
       |> Enum.sort_by(& &1.name)
 
     %Image{

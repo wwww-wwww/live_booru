@@ -14,6 +14,14 @@
   </h1>
 <% end %>
 
+<%= if @editing and @edit_level >= 100 do %>
+<datalist id="tag_suggestions">
+  <%= for tag <- @tag_suggestions do %>
+    <option><%= tag %></option>
+  <% end %>
+</datalist>
+<% end %>
+
 <ul>
   <li>ID: <%= @tag.id %></li>
   <li>Type:
@@ -39,9 +47,10 @@
   <li>Count: <%= @count %></li>
   <%= if @editing and @edit_level >= 100 do %>
     <li>
-      <form phx-submit="save">
+      Alias of:
+      <form phx-submit="save" phx-change="suggest_tags">
         <div>
-          <input name="tag" value={if is_nil(@tag.tag), do: "", else: @tag.tag.name}>
+          <input list="tag_suggestions" autocomplete="off" name="tag" value={if is_nil(@tag.tag), do: "", else: @tag.tag.name}>
           <%= submit("Save") %>
         </div>
       </form>
@@ -59,6 +68,32 @@
       Aliases:
       <%= for alias <- @tag.aliases do %>
         <%= live_patch(alias.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, alias.id)) %>
+      <% end %>
+    </li>
+  <% end %>
+  <%= if @editing and @edit_level >= 100 do %>
+    <li>
+      Parent:
+      <form phx-submit="save" phx-change="suggest_tags">
+        <div>
+          <input list="tag_suggestions" autocomplete="off" name="parent" value={if is_nil(@tag.parent), do: "", else: @tag.parent.name}>
+          <%= submit("Save") %>
+        </div>
+      </form>
+    </li>
+  <% else %>
+    <%= if !is_nil(@tag.parent) do %>
+      <li>
+        Parent:
+        <%= live_patch(@tag.parent.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, @tag.parent_id)) %>
+      </li>
+    <% end %>
+  <% end %>
+  <%= if length(@tag.children) > 0 do %>
+    <li>
+      Children:
+      <%= for child <- @tag.children do %>
+        <%= live_patch(child.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, child.id)) %>
       <% end %>
     </li>
   <% end %>
@@ -87,6 +122,11 @@
   <%= if @can_edit do %>
     <div><button type="submit" phx-click="edit">Edit</button></div>
   <% end %>
+<% end %>
+
+<%= if @root.id != @tag.id or length(@tag.children) > 0 do %>
+<h2>Tree</h2>
+<ul><%= children(@socket, @root, @tag) %></ul>
 <% end %>
 
 <%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.TagChangesLive, @tag.id)) %>

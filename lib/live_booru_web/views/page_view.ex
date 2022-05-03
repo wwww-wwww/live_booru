@@ -129,4 +129,31 @@ defmodule LiveBooruWeb.PageView do
       true -> "Safe"
     end
   end
+
+  def children(socket, tag, current) do
+    tag = Repo.preload(tag, :children)
+
+    e =
+      if current.id == tag.id do
+        tag.name
+      else
+        live_patch(tag.name, to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id))
+      end
+
+    content_tag(:li) do
+      if length(tag.children) > 0 do
+        [
+          e,
+          content_tag(:ul) do
+            Enum.map(
+              tag.children,
+              &children(socket, &1, current)
+            )
+          end
+        ]
+      else
+        e
+      end
+    end
+  end
 end

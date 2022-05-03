@@ -3,13 +3,15 @@ defmodule LiveBooruWeb.TagLive do
 
   alias LiveBooru.{Repo, Tag}
 
+  import Ecto.Query, only: [from: 2]
+
   def render(assigns) do
     LiveBooruWeb.PageView.render("tag.html", assigns)
   end
 
   def mount(%Tag{} = tag, _session, socket) do
     tag
-    |> Repo.preload([:aliases, :tag])
+    |> Repo.preload([:aliases, :tag, :children, :parent])
     |> case do
       nil ->
         {:ok,
@@ -23,6 +25,8 @@ defmodule LiveBooruWeb.TagLive do
           |> Enum.at(0)
           |> elem(1)
 
+        root = Tag.root(tag)
+
         socket =
           socket
           |> assign(
@@ -34,6 +38,8 @@ defmodule LiveBooruWeb.TagLive do
           |> assign(:editing, false)
           |> assign(:tag, tag)
           |> assign(:count, count)
+          |> assign(:root, root)
+          |> assign(:tag_suggestions, [])
 
         {:ok, socket}
     end
@@ -86,7 +92,7 @@ defmodule LiveBooruWeb.TagLive do
                   end
 
                   socket
-                  |> assign(:tag, Repo.preload(tag, [:tag, :aliases]))
+                  |> assign(:tag, Repo.preload(tag, [:tag, :aliases, :children, :parent]))
                   |> assign(:editing, false)
 
                 {:error, cs} ->
@@ -154,8 +160,56 @@ defmodule LiveBooruWeb.TagLive do
     {:noreply, socket}
   end
 
+  def handle_event("save", %{"parent" => tag_name}, socket) do
+    socket =
+      case String.trim(tag_name) do
+        "" ->
+          change_tag(socket, %{parent_id: nil})
+
+        tag_name ->
+          Repo.get_by(Tag, name: tag_name)
+          |> case do
+            nil ->
+              put_flash(socket, :error, "Tag does not exist")
+
+            tag ->
+              if not Enum.any?(Tag.children(socket.assigns.tag), &(&1.id == tag.id)) do
+                change_tag(socket, %{parent_id: tag.id})
+              else
+                put_flash(socket, :error, "Parent forms a cycle")
+              end
+          end
+      end
+
+    {:noreply, socket}
+  end
+
   def handle_event("cancel", _, socket) do
     socket = assign(socket, :editing, false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("suggest_tags", %{"parent" => q}, socket) do
+    handle_event("suggest_tags", %{"tag" => q}, socket)
+  end
+
+  def handle_event("suggest_tags", %{"tag" => q}, socket) do
+    socket =
+      if String.length(q) > 0 do
+        query =
+          from t in Repo.build_search_tags(q),
+            where: t.type != :meta_system
+
+        suggestions =
+          Repo.all(query)
+          |> Enum.map(& &1.name)
+          |> Enum.sort()
+
+        assign(socket, :tag_suggestions, suggestions)
+      else
+        socket
+      end
 
     {:noreply, socket}
   end
