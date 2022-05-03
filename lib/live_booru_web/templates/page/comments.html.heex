@@ -11,23 +11,13 @@
   </div>
 
   <div class="right">
-    <div class="info">
-      <div>
-        <span>Date: <%= Timex.from_now(image.inserted_at) %></span>
-        <span>User: <%= live_redirect(image.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, image.user_id)) %></span>
-        <span>Rating: <%= rating(image) %></span>
-        <span>Score: <%= score(image) %></span>
-      </div>
-      <div class="tags">
-        Tags:
-        <%= for tag <- Enum.sort_by(image.tags, & &1.name) do %>
-          <%= live_redirect(tag.name,
-            to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: quote_tag(tag)),
-            class: tag.type
-          ) %>
-        <% end %>
-      </div>
-    </div>
+    <%= live_component(
+      LiveBooruWeb.ImageDetailsComponent,
+      id: "image_#{image.id}",
+      image: image,
+      score: LiveBooru.ImageVote.get_score(image),
+      current_user: @current_user)
+    %>
 
     <div class="comments">
       <%= for comment <- comments do %>

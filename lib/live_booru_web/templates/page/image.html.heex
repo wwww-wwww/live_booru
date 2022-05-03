@@ -72,7 +72,7 @@
       <% highlight = if @self_vote == true, do: " highlight", else: "" %>
       <%= submit("thumb_up", phx_click: "vote_up", class: "icon up#{highlight}") %>
     <% end %>
-    <%= score(@image) %>
+    <%= @score %>
     <%= if assigns.current_user do %>
       <% highlight = if @self_vote == false, do: " highlight", else: "" %>
       <%= submit("thumb_down", phx_click: "vote_down", class: "icon down#{highlight}") %>

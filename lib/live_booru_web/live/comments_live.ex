@@ -21,6 +21,21 @@ defmodule LiveBooruWeb.CommentsLive do
     {:noreply, socket}
   end
 
+  def handle_info(%{event: "image_score", payload: {image_id, score}}, socket) do
+    send_update(LiveBooruWeb.ImageDetailsComponent, id: "image_#{image_id}", score: score)
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "image", payload: image}, socket) do
+    send_update(LiveBooruWeb.ImageDetailsComponent, id: "image_#{image.id}", image: image)
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "comment", payload: comment}, socket) do
+    send_update(LiveBooruWeb.CommentComponent, id: "comment_#{comment.id}", comment: comment)
+    {:noreply, socket}
+  end
+
   def handle_info(%{event: "comments"}, socket) do
     {:noreply, assign(socket, comments: get_comments())}
   end
@@ -33,6 +48,18 @@ defmodule LiveBooruWeb.CommentsLive do
     Repo.all(query)
     |> Repo.preload([:user, [votes: :user], [image: [:user, :votes, :tags]]])
     |> Enum.chunk_by(& &1.image_id)
+  end
+
+  def update_comment(comment) do
+    LiveBooruWeb.Endpoint.broadcast(@topic, "comment", comment)
+  end
+
+  def update_image(image) do
+    LiveBooruWeb.Endpoint.broadcast(@topic, "image", image)
+  end
+
+  def update_image_score(%{id: image_id}, score) do
+    LiveBooruWeb.Endpoint.broadcast(@topic, "image_score", {image_id, score})
   end
 
   def update() do

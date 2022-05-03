@@ -66,6 +66,7 @@ defmodule LiveBooruWeb.ImageLive do
           |> assign(:editing, true)
           |> assign(:preview, nil)
           |> assign(:comments, comments)
+          |> assign(:score, LiveBooruWeb.PageView.score(image))
           |> assign(:favorite, favorite)
           |> assign(:favorites, favorites)
 
@@ -103,10 +104,13 @@ defmodule LiveBooruWeb.ImageLive do
     ImageVote.add(socket.assigns.current_user, socket.assigns.image, true)
     |> case do
       {:ok, up} ->
+        new_score = ImageVote.get_score(socket.assigns.image)
+        LiveBooruWeb.CommentsLive.update_image_score(socket.assigns.image, new_score)
+
         Endpoint.broadcast(
           "image:#{socket.assigns.image.id}",
           "score",
-          ImageVote.get_score(socket.assigns.image)
+          new_score
         )
 
         {:noreply, assign(socket, :self_vote, up)}
@@ -120,10 +124,13 @@ defmodule LiveBooruWeb.ImageLive do
     ImageVote.add(socket.assigns.current_user, socket.assigns.image, false)
     |> case do
       {:ok, up} ->
+        new_score = ImageVote.get_score(socket.assigns.image)
+        LiveBooruWeb.CommentsLive.update_image_score(socket.assigns.image, new_score)
+
         Endpoint.broadcast(
           "image:#{socket.assigns.image.id}",
           "score",
-          ImageVote.get_score(socket.assigns.image)
+          new_score
         )
 
         {:noreply, assign(socket, :self_vote, up)}
@@ -170,6 +177,8 @@ defmodule LiveBooruWeb.ImageLive do
         |> Repo.insert()
         |> case do
           {:ok, comment} ->
+            LiveBooruWeb.CommentsLive.update()
+
             Endpoint.broadcast(
               "image:#{socket.assigns.image.id}",
               "comment",

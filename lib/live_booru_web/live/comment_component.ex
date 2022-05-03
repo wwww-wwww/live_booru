@@ -33,12 +33,16 @@ defmodule LiveBooruWeb.CommentComponent do
     CommentVote.add(socket.assigns.current_user, socket.assigns.comment, true)
     |> case do
       {:ok, _} ->
-        LiveBooruWeb.CommentsLive.update()
+        new_comment =
+          Repo.get(Comment, socket.assigns.comment.id)
+          |> Repo.preload([:user, votes: :user])
+
+        LiveBooruWeb.CommentsLive.update_comment(new_comment)
 
         Endpoint.broadcast(
           "image:#{socket.assigns.comment.image_id}",
           "comment_update",
-          Repo.get(Comment, socket.assigns.comment.id) |> Repo.preload([:user, votes: :user])
+          new_comment
         )
 
         {:noreply, socket}
@@ -52,12 +56,16 @@ defmodule LiveBooruWeb.CommentComponent do
     CommentVote.add(socket.assigns.current_user, socket.assigns.comment, false)
     |> case do
       {:ok, _} ->
-        LiveBooruWeb.CommentsLive.update()
+        new_comment =
+          Repo.get(Comment, socket.assigns.comment.id)
+          |> Repo.preload([:user, votes: :user])
+
+        LiveBooruWeb.CommentsLive.update_comment(new_comment)
 
         Endpoint.broadcast(
           "image:#{socket.assigns.comment.image_id}",
           "comment_update",
-          Repo.get(Comment, socket.assigns.comment.id) |> Repo.preload([:user, votes: :user])
+          new_comment
         )
 
         {:noreply, socket}
