@@ -10,6 +10,7 @@ defmodule LiveBooruWeb.TagListLive do
   def mount(_, _session, socket) do
     tags =
       Repo.all(Tag)
+      |> Repo.preload([:tag, :parent])
       |> Repo.count_tags()
       |> Enum.sort_by(&elem(&1, 0).id, :desc)
 

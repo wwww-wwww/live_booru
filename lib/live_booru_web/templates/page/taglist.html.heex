@@ -3,12 +3,37 @@
 <h1>Tags</h1>
 
 <table>
+<tr>
+  <th>ID</th>
+  <th>Tag</th>
+  <th>Type</th>
+  <th>Count</th>
+  <th>Parent</th>
+  <th>Alias of</th>
+</tr>
+
 <%= for {tag, n} <- @tags do %>
 <tr>
   <td><%= tag.id %></td>
   <td><%= live_redirect(tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, tag.id)) %></td>
-  <td><%= tag.type %></td>
+  <td>
+    <%= if !is_nil(tag.tag) do %>
+      Alias
+    <% else %>
+      <%= tag.type %>
+    <% end %>
+  </td>
   <td><%= n %></td>
+  <td>
+    <%= if !is_nil(tag.parent) do %>
+      <%= live_redirect(tag.parent.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, tag.parent_id)) %>
+    <% end %>
+  </td>
+  <td>
+    <%= if !is_nil(tag.tag) do %>
+      <%= live_redirect(tag.tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, tag.tag_id)) %>
+    <% end %>
+  </td>
 </tr>
 <% end %>
 </table>
