@@ -61,12 +61,12 @@ defmodule LiveBooruWeb.UploadLive do
 
     socket =
       if String.length(value) > 0 do
-        query =
-          from t in Repo.build_search_tags(value),
-            where: t.type != :meta_system
-
         suggestions =
-          Repo.all(query)
+          from(t in Repo.build_search_tags(value),
+            where: t.type != :meta_system,
+            limit: 10
+          )
+          |> Repo.all()
           |> Enum.map(& &1.name)
           |> Kernel.--(MapSet.to_list(socket.assigns.tags))
           |> Enum.sort()
