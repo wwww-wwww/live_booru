@@ -19,7 +19,7 @@ defmodule LiveBooruWeb.UploadLive do
       |> assign(:suggestions, [])
       |> assign(:tags, MapSet.new())
       |> allow_upload(:file,
-        accept: ~w(.jxl .jpg .jpeg .png .webp),
+        accept: ~w(.jxl .jpg .jpeg .png .webp .gif),
         max_entries: 1,
         max_file_size: 50_000_000
       )

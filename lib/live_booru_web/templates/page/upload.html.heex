@@ -2,6 +2,14 @@
 
 <h1>Upload</h1>
 
+<ul>
+  <li>Any type of content is welcome</li>
+  <li>Title and source are optional</li>
+  <li>JXL uploads are processed first</li>
+  <li>Non-JXL files are encoded with -q 100 -e 9 -E 3 -I 1</li>
+  <li>Supported upload formats: JPEG XL, JPEG, PNG, APNG, GIF</li>
+</ul>
+
 <form id="form_submit" phx-change="validate" phx-submit="submit">
   <h3>File</h3>
   <section phx-drop-target={@uploads.file.ref}>

@@ -18,7 +18,6 @@ defmodule LiveBooru.Encoder do
 
   def handle_info(:startup, state) do
     GenServer.call(EncoderManager, {:register, self()})
-    # Status.put(state.id, "Idle")
 
     GenServer.cast(self(), :loop)
     {:noreply, state}
@@ -27,10 +26,6 @@ defmodule LiveBooru.Encoder do
   def handle_cast(:loop, state) do
     case WorkerManager.pop(EncoderManager, sort_by: &{not &1.is_jxl, &1.id}, order: :asc) do
       :empty ->
-        if state.active do
-          # Status.put(state.id, "Idle")
-        end
-
         {:noreply, %{state | active: false}}
 
       job ->
@@ -70,13 +65,12 @@ defmodule LiveBooru.Encoder do
                 IO.inspect(err)
             end
           else
-            # TODO: deal with animated images
             case Uploader.get_format(in_path) do
-              nil -> nil
               "JPEG" -> true
               "PNG" -> true
               "GIF" -> true
               "WEBP" -> true
+              _ -> nil
             end
             |> case do
               nil ->
