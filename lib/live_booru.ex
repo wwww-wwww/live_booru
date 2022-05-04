@@ -30,9 +30,26 @@ defmodule LiveBooru do
 
   def jxlinfo() do
     Repo.all(Image)
-    |> Enum.map(fn image ->
+    |> Enum.each(fn image ->
       Ecto.Changeset.change(image, %{info: LiveBooru.Jxl.info(image.path)})
       |> Repo.update()
+    end)
+  end
+
+  def autotag() do
+    Repo.all(Image)
+    |> Repo.preload(:tags)
+    |> Enum.each(fn image ->
+      tags =
+        image.tags
+        |> Enum.map(& &1.name)
+        |> LiveBooru.AutoTag.tag(image.info, nil, nil)
+        |> Enum.map(&Repo.get_by(Tag, name: &1))
+
+      image =
+        Ecto.Changeset.change(image)
+        |> Ecto.Changeset.put_assoc(:tags, tags)
+        |> Repo.update()
     end)
   end
 
