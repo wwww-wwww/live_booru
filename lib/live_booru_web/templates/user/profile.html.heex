@@ -9,6 +9,10 @@
     <td><%= @user.inserted_at %></td>
   </tr>
   <tr>
+    <td>Level</td>
+    <td><%= @user.level %></td>
+  </tr>
+  <tr>
     <td>Posts</td>
     <td><%= @n_images %></td>
   </tr>
@@ -31,6 +35,24 @@
 </table>
 </div>
 
+<%= if @same_user do %>
+<h2>Settings</h2>
+<.form let={f} for={@changeset} phx-change="settings">
+  <div>
+    <label>
+      Show only safe on index by default:
+      <%= checkbox(f, :index_default_safe) %>
+    </label>
+  </div>
+  <div>
+    <label>
+      Theme:
+      <%= select(f, :theme, Ecto.Enum.values(LiveBooru.Accounts.User, :theme)) %>
+    </label>
+  </div>
+</.form>
+<% end %>
+
 <h2>Collections</h2>
 
 <div>
@@ -39,7 +61,7 @@
       <h3>
         <span>
           <%= collection.name %>
-          <%= if !is_nil(@current_user) and @current_user.id == @user.id do %>
+          <%= if @same_user do %>
             <button phx-click="delete_collection" value={collection.id}>Delete</button>
           <% end %>
         </span>

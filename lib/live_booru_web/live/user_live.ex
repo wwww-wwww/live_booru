@@ -53,6 +53,17 @@ defmodule LiveBooruWeb.UserLive do
           |> assign(n_image_changes: n_image_changes)
           |> assign(n_tag_changes: n_tag_changes)
           |> assign(n_favorites: n_favorites)
+          |> assign(
+            same_user:
+              !is_nil(socket.assigns.current_user) and socket.assigns.current_user.id == user.id
+          )
+
+        socket =
+          if socket.assigns.same_user do
+            assign(socket, changeset: Ecto.Changeset.change(user))
+          else
+            socket
+          end
 
         {:ok, socket}
     end
@@ -68,7 +79,7 @@ defmodule LiveBooruWeb.UserLive do
   end
 
   def handle_event("delete_collection", %{"value" => id}, socket) do
-    if socket.assigns.user.id == socket.assigns.current_user.id do
+    if socket.assigns.same_user do
       Repo.get(Collection, id)
       |> Repo.delete()
     end
@@ -79,6 +90,19 @@ defmodule LiveBooruWeb.UserLive do
        :user,
        Repo.get(User, socket.assigns.user.id) |> Repo.preload(collections: :images)
      )}
+  end
+
+  def handle_event("settings", %{"user" => attrs}, socket) do
+    if socket.assigns.same_user do
+      Ecto.Changeset.cast(socket.assigns.changeset, attrs, [:index_default_safe, :theme])
+      |> Repo.update()
+      |> case do
+        {:ok, user} -> {:noreply, assign(socket, changeset: Ecto.Changeset.change(user))}
+        _ -> {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
   end
 end
 

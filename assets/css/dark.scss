@@ -1,0 +1,44 @@
+> div {
+  background-color: rgb(30, 30, 30);
+  color: whitesmoke;
+
+  nav {
+    a {
+      color: whitesmoke;
+    }
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  a {
+    color: skyblue;
+  }
+
+  .search input {
+    background-color: rgb(36, 36, 36);
+    border: 1px solid gray;
+  }
+
+  .comment {
+    background-color: rgb(40, 40, 40);
+    color: whitesmoke;
+  }
+}
+
+.ImageLive {
+  .comment_form {
+    textarea {
+      background-color: rgb(40, 40, 40);
+      color: whitesmoke;
+      border: 1px solid gray;
+    }
+  }
+}
+
+.IndexLive {
+  .pages {
+    a {
+      border: 1px solid gray;
+    }
+  }
+}

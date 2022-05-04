@@ -43,7 +43,11 @@ defmodule LiveBooruWeb.IndexLive do
   end
 
   def mount(_params, session, socket) do
-    mount(%{"q" => "", "offset" => 0}, session, socket)
+    if !is_nil(socket.assigns.current_user) and !socket.assigns.current_user.index_default_safe do
+      mount(%{"q" => "", "offset" => 0}, session, socket)
+    else
+      mount(%{"q" => "-NSFW -Suggestive", "offset" => 0}, session, socket)
+    end
   end
 
   def handle_params(params, session, socket) do

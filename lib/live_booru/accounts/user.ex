@@ -8,6 +8,9 @@ defmodule LiveBooru.Accounts.User do
     field(:password, :string, redact: true)
     field(:level, :integer)
 
+    field(:index_default_safe, :boolean, default: true)
+    field(:theme, Ecto.Enum, values: [:default, :dark], default: :default)
+
     has_many(:collections, LiveBooru.Collection)
     has_many(:uploads, LiveBooru.Upload)
     has_many(:images, LiveBooru.Image)
