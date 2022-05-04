@@ -45,6 +45,8 @@ defmodule LiveBooru do
         |> Enum.map(& &1.name)
         |> LiveBooru.AutoTag.tag(image.info, nil, nil)
         |> Enum.map(&Repo.get_by(Tag, name: &1))
+        |> Enum.map(&Tag.parents(&1))
+        |> List.flatten()
 
       image =
         Ecto.Changeset.change(image)

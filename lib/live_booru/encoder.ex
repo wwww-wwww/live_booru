@@ -180,6 +180,7 @@ defmodule LiveBooru.Encoder do
       |> Stream.filter(&(!is_nil(&1)))
       |> Enum.map(&Tag.parents(&1))
       |> List.flatten()
+      |> Enum.uniq_by(& &1.id)
       |> Enum.sort_by(& &1.name)
 
     %Image{

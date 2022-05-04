@@ -29,7 +29,7 @@ defmodule LiveBooru.AutoTag do
             _ -> true
           end
         else
-          true
+          false
         end
       else
         false
