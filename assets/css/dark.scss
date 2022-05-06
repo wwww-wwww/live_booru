@@ -41,4 +41,13 @@
       border: 1px solid gray;
     }
   }
+
+  .images {
+    > div {
+      .info {
+        background-color: rgb(36, 36, 36);
+        border-color: dimgray;
+      }
+    }
+  }
 }

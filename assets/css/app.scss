@@ -136,12 +136,57 @@ nav {
     flex-wrap: wrap;
     gap: 0.5em;
 
-    > a {
-      width: 200px;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    > div {
+      position: relative;
+
+      > a {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .info {
+        flex-wrap: wrap;
+        gap: 0 0.5em;
+        max-height: 6em;
+        overflow-y: auto;
+        font-size: small;
+        background-color: rgb(250, 250, 250);
+        border: 1px solid lightgray;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        display: none;
+        opacity: 0;
+        transform: translateY(-50%);
+        position: absolute;
+        top: 0;
+        pointer-events: none;
+        animation-fill-mode: forwards;
+      }
+    }
+
+    @keyframes show {
+      from {
+        opacity: 0;
+        transform: translateY(-50%);
+      }
+      to {
+        z-index: 1;
+        opacity: 1;
+        transform: translateY(-100%);
+      }
+    }
+
+    > div:hover {
+      .info {
+        pointer-events: inherit;
+        display: flex;
+        animation-name: show;
+        animation-duration: 0.2s;
+        animation-delay: 0.5s;
+      }
     }
   }
 

@@ -25,7 +25,7 @@ defmodule LiveBooruWeb.IndexLive do
 
     images =
       images
-      |> Repo.preload([:tags])
+      |> Repo.preload([:tags, :user, :votes])
 
     socket =
       socket
