@@ -12,7 +12,7 @@
     <tr>
       <td><%= Timex.from_now(change.inserted_at) %></td>
       <td><%= live_redirect(change.image_id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, change.image_id)) %></td>
-      <td><%= change.user.name %></td>
+      <td><%= live_redirect(change.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, change.user.id)) %></td>
       <td><%= Enum.join(change.tags, ", ") %></td>
       <td><%= change.source %></td>
     </tr>
