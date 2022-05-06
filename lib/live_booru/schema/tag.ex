@@ -11,7 +11,7 @@ defmodule LiveBooru.Tag do
       values: [:general, :meta, :meta_system, :copyright, :character, :artist],
       default: :general
 
-    field :description, :string
+    field :description, :string, default: ""
 
     field :locked, :boolean, default: false
 

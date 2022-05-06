@@ -1,5 +1,5 @@
 defmodule LiveBooru do
-  alias LiveBooru.{Repo, Tag, Image, AutoTag}
+  alias LiveBooru.{Repo, Tag, Image, ImageChange, AutoTag}
 
   def files_root(), do: Application.get_env(:live_booru, :files_root)
   def thumb_root(), do: Application.get_env(:live_booru, :thumb_root)
@@ -48,10 +48,9 @@ defmodule LiveBooru do
         |> Enum.map(&Tag.parents(&1))
         |> List.flatten()
 
-      image =
-        Ecto.Changeset.change(image)
-        |> Ecto.Changeset.put_assoc(:tags, tags)
-        |> Repo.update()
+      Ecto.Changeset.change(image)
+      |> Ecto.Changeset.put_assoc(:tags, tags)
+      |> Repo.update()
     end)
   end
 
@@ -62,6 +61,47 @@ defmodule LiveBooru do
 
       Ecto.Changeset.change(image, %{width: w, height: h})
       |> Repo.update()
+    end)
+  end
+
+  def image_history() do
+    changes = Repo.all(ImageChange) |> Enum.sort_by(& &1.id, :desc) |> Enum.with_index()
+
+    changes
+    |> Enum.filter(&(elem(&1, 0).source_prev == nil))
+    |> Enum.each(fn {change, n} ->
+      changes
+      |> Enum.drop(n + 1)
+      |> Enum.reduce_while(nil, fn {item, _}, _ ->
+        if item.image_id == change.image_id do
+          {:halt, item}
+        else
+          {:cont, nil}
+        end
+      end)
+      |> case do
+        nil ->
+          Ecto.Changeset.change(change, %{
+            tags_added: [],
+            tags_removed: [],
+            source_prev: change.source
+          })
+
+        prev ->
+          {added, removed} =
+            prev
+            |> case do
+              nil -> {[], []}
+              prev -> {change.tags -- prev.tags, prev.tags -- change.tags}
+            end
+
+          Ecto.Changeset.change(change, %{
+            tags_added: added,
+            tags_removed: removed,
+            source_prev: prev.source
+          })
+          |> Repo.update()
+      end
     end)
   end
 end

@@ -150,20 +150,28 @@ defmodule LiveBooruWeb.ImageEditLive do
               end)
               |> Enum.sort_by(& &1.name)
 
+            old_tags_ids = Enum.map(image.tags, & &1.id)
+            new_tags_ids = Enum.map(new_tags, & &1.id)
+            tags_added = new_tags_ids -- old_tags_ids
+            tags_removed = old_tags_ids -- new_tags_ids
+
             Ecto.Changeset.change(image, %{source: source})
             |> Ecto.Changeset.put_assoc(:tags, new_tags)
             |> Repo.update()
             |> case do
-              {:ok, image} ->
+              {:ok, new_image} ->
                 %LiveBooru.ImageChange{
                   user_id: socket.assigns.current_user.id,
                   image_id: image.id,
                   source: source,
-                  tags: Enum.map(new_tags, & &1.id) |> Enum.sort()
+                  source_prev: image.source,
+                  tags: Enum.map(new_tags, & &1.id) |> Enum.sort(),
+                  tags_added: tags_added,
+                  tags_removed: tags_removed
                 }
                 |> Repo.insert()
 
-                tag_names = image.tags |> Enum.map(& &1.name)
+                tag_names = new_image.tags |> Enum.map(& &1.name)
 
                 rating =
                   cond do
@@ -173,13 +181,13 @@ defmodule LiveBooruWeb.ImageEditLive do
                   end
 
                 socket
-                |> assign(:image, image)
+                |> assign(:image, new_image)
                 |> assign(:source, image.source)
                 |> assign(:rating, rating)
                 |> assign(
                   :tags,
                   MapSet.new(
-                    image.tags
+                    new_image.tags
                     |> Enum.map(& &1.name)
                     |> Kernel.--(["Suggestive", "NSFW"])
                   )

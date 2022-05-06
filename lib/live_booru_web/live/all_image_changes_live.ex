@@ -36,13 +36,12 @@ defmodule LiveBooruWeb.AllImageChangesLive do
       %{
         inserted_at: change.inserted_at,
         user: change.user,
+        source_prev: change.source_prev,
         source: change.source,
         image_id: change.image_id,
-        tags:
-          Enum.map(change.tags, fn tag ->
-            Map.get(tags, tag)
-          end)
-          |> Enum.sort()
+        tags: Enum.map(change.tags, &Map.get(tags, &1)) |> Enum.sort(),
+        added: Enum.map(change.tags_added || [], &Map.get(tags, &1)) |> Enum.sort(),
+        removed: Enum.map(change.tags_removed || [], &Map.get(tags, &1)) |> Enum.sort()
       }
     end)
   end

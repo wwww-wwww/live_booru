@@ -6,6 +6,7 @@
     <th>User</th>
     <th>Tag</th>
     <th>Description</th>
+    <th>Previous Description</th>
   </tr>
   <%= for change <- @changes do %>
     <tr>
@@ -13,6 +14,7 @@
       <td><%= live_redirect(change.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, change.user_id)) %></td>
       <td><%= live_redirect(change.tag.name, to: Routes.live_path(@socket, LiveBooruWeb.TagLive, change.tag_id)) %></td>
       <td><%= change.description %></td>
+      <td><%= change.description_prev %></td>
     </tr>
   <% end %>
 </table>

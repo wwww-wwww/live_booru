@@ -81,18 +81,19 @@ defmodule LiveBooruWeb.TagLive do
 
             change ->
               case Repo.update(change) do
-                {:ok, tag} ->
+                {:ok, new_tag} ->
                   if attrs[:description] do
                     %LiveBooru.TagChange{
                       user_id: socket.assigns.current_user.id,
                       tag_id: tag.id,
-                      description: attrs[:description]
+                      description: attrs[:description],
+                      description_prev: tag.description
                     }
                     |> Repo.insert()
                   end
 
                   socket
-                  |> assign(:tag, Repo.preload(tag, [:tag, :aliases, :children, :parent]))
+                  |> assign(:tag, Repo.preload(new_tag, [:tag, :aliases, :children, :parent]))
                   |> assign(:editing, false)
 
                 {:error, cs} ->

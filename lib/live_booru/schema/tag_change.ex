@@ -6,6 +6,7 @@ defmodule LiveBooru.TagChange do
     belongs_to :tag, LiveBooru.Tag
 
     field :description, :string
+    field :description_prev, :string
 
     timestamps()
   end

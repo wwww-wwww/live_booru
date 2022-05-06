@@ -7,6 +7,7 @@
 <tr>
   <th>Upload Hash</th>
   <th>Source</th>
+  <th>Tags</th>
   <th>Uploader</th>
   <th>Working</th>
   <th>Date</th>
@@ -16,9 +17,10 @@
 <tr>
   <td><%= job.hash %></td>
   <td><%= job.source %></td>
+  <td><%= Enum.join(job.tags, ", ") %></td>
   <td><%= job.user.name %></td>
   <td><%= working %></td>
-  <td><%= job.inserted_at %></td>
+  <td><%= Timex.from_now(job.inserted_at) %></td>
 </tr>
 <% end %>
 </table>

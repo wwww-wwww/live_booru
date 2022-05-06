@@ -6,7 +6,11 @@ defmodule LiveBooru.ImageChange do
     belongs_to :image, LiveBooru.Image
 
     field :source, :string
+    field :source_prev, :string
+
     field :tags, {:array, :integer}
+    field :tags_added, {:array, :integer}
+    field :tags_removed, {:array, :integer}
 
     timestamps()
   end
