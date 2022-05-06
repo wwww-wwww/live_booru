@@ -54,7 +54,7 @@ defmodule LiveBooru.AutoTag do
     |> append_if(mp > 1_900_000, "High Resolution")
     |> append_if(mp > 6_000_000, "Absurd Resolution")
     |> append_if(alpha, "Alpha Transparency")
-    |> append_if(animation, "Animation")
+    |> append_if(animation, "Animated")
     |> append_if(grayscale, "Grayscale")
     |> append_if(jpeg_reconstruction, "JPEG Reconstruction")
     |> Enum.uniq()
