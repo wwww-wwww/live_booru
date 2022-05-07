@@ -412,9 +412,15 @@ button.icon {
   cursor: pointer;
 }
 
-input,
-button[type="submit"] {
+input[type="submit"],
+input[type="text"],
+input:not([type]),
+button {
   padding: 0.5rem;
+}
+
+input,
+button {
   border-radius: 0.25rem;
 }
 
@@ -478,6 +484,31 @@ button {
   }
 }
 
+.UploadLive,
+.ImageEditLive {
+  .suggestions,
+  .tags {
+    > button {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.5em;
+      cursor: pointer;
+      border: none;
+      border-radius: 100vh;
+      background-color: rgb(230, 230, 230);
+    }
+
+    > button:hover {
+      background-color: rgb(240, 240, 240);
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+}
+
 .SignUpLive,
 .SignInLive,
 .UploadLive,
@@ -528,28 +559,6 @@ button {
       content: "close";
       font-family: "Material Icons";
     }
-  }
-
-  .suggestions,
-  .tags {
-    > button {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-      padding: 0.5em;
-      cursor: pointer;
-      border: none;
-      border-radius: 100vh;
-      background-color: rgb(230, 230, 230);
-    }
-
-    > button:hover {
-      background-color: rgb(240, 240, 240);
-    }
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
   }
 }
 

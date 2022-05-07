@@ -58,3 +58,29 @@ input[type="text"] {
     }
   }
 }
+
+.UploadLive,
+.ImageEditLive {
+  .suggestions,
+  .tags {
+    > button {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.5em;
+      cursor: pointer;
+      border: none;
+      border-radius: 100vh;
+      background-color: rgb(48, 48, 48);
+      color: lightgray;
+    }
+
+    > button:hover {
+      background-color: rgb(64, 64, 64);
+    }
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+}
