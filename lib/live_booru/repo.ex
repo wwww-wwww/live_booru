@@ -8,7 +8,16 @@ defmodule LiveBooru.Repo do
   alias LiveBooru.Accounts.User
   alias LiveBooru.{Repo, ImagesTags, Tag, Image, Collection, ImagesCollections}
 
-  import Ecto.Query, only: [from: 1, from: 2, limit: 2, offset: 2, order_by: 2]
+  import Ecto.Query,
+    only: [
+      from: 1,
+      from: 2,
+      limit: 2,
+      offset: 2,
+      order_by: 2,
+      dynamic: 1,
+      dynamic: 2
+    ]
 
   # input: [%Tag{}]
   # output: [{%Tag{}, n}]
@@ -28,20 +37,29 @@ defmodule LiveBooru.Repo do
     Enum.map(tags, &{&1, Map.get(counts, &1.id, 0)})
   end
 
-  @re_search ~r/((?:-){0,1}(?:\"(?:\\(?:\\\\)*\")+(?:[^\\](?:\\(?:\\\\)*\")+|[^\"])*\"|\"(?:[^\\](?:\\(?:\\\\)*\")+|[^\"])*\"|[^ ]+))/iu
+  @re_search ~r/((?:-{0,1}|[^ ]*?:)\"(?:\\\"|.)*?\"|[^ ]+)/iu
 
   def parse_terms(query) do
-    {terms_include, terms_exclude} =
+    {terms_include, terms_exclude, terms_extra} =
       Regex.scan(@re_search, query)
       |> Enum.map(&Enum.at(&1, 1))
       |> Enum.map(&String.downcase(&1))
       |> Enum.map(fn term ->
         case term do
-          "-" <> term ->
-            {false, term}
-
-          term ->
-            {true, term}
+          "user:" <> term -> {:user, term}
+          "collection:" <> term -> {:collection, term}
+          "width:>=" <> term -> {{:width, :>=}, term}
+          "width:<=" <> term -> {{:width, :<=}, term}
+          "width:>" <> term -> {{:width, :>}, term}
+          "width:<" <> term -> {{:width, :<}, term}
+          "width:" <> term -> {{:width, :==}, term}
+          "height:>=" <> term -> {{:height, :>=}, term}
+          "height:<=" <> term -> {{:height, :<=}, term}
+          "height:>" <> term -> {{:height, :>}, term}
+          "height:<" <> term -> {{:height, :<}, term}
+          "height:" <> term -> {{:height, :==}, term}
+          "-" <> term -> {:exclude, term}
+          term -> {:include, term}
         end
       end)
       |> Enum.map(fn {inc, term} ->
@@ -55,15 +73,15 @@ defmodule LiveBooru.Repo do
       end)
       |> Enum.map(&{elem(&1, 0), String.replace(elem(&1, 1), "\\\"", "\"")})
       |> Enum.filter(&(String.length(elem(&1, 1)) > 0))
-      |> Enum.reduce({[], []}, fn {term_include, term}, {include, exclude} ->
-        if term_include do
-          {include ++ [term], exclude}
-        else
-          {include, exclude ++ [term]}
+      |> Enum.reduce({[], [], []}, fn {term_type, term}, {include, exclude, extra} ->
+        case term_type do
+          :include -> {include ++ [term], exclude, extra}
+          :exclude -> {include, exclude ++ [term], extra}
+          _ -> {include, exclude, extra ++ [{term_type, term}]}
         end
       end)
 
-    {Enum.uniq(terms_include), Enum.uniq(terms_exclude)}
+    {Enum.uniq(terms_include), Enum.uniq(terms_exclude), Enum.uniq(terms_extra)}
   end
 
   def filter(query, opts \\ []) do
@@ -98,7 +116,7 @@ defmodule LiveBooru.Repo do
   end
 
   def search(query, opts) do
-    {inc, exc} = Repo.parse_terms(query)
+    {inc, exc, extra} = Repo.parse_terms(query)
 
     query =
       case {inc, exc} do
@@ -137,6 +155,64 @@ defmodule LiveBooru.Repo do
             on: s.image_id == i.id,
             where: i.id not in subquery(query_exclude)
       end
+
+    extra_conditions =
+      Enum.reduce(extra, dynamic(true), fn term, dynamic ->
+        case term do
+          {:user, user_id} ->
+            case Integer.parse(user_id) do
+              {user_id, _} -> dynamic([q], ^dynamic and q.user_id == ^user_id)
+              _ -> dynamic
+            end
+
+          {:collection, collection_id} ->
+            case Integer.parse(collection_id) do
+              {collection_id, _} ->
+                query =
+                  from c in ImagesCollections,
+                    where: c.collection_id == ^collection_id,
+                    select: c.image_id
+
+                dynamic([q], ^dynamic and q.id in subquery(query))
+
+              _ ->
+                dynamic
+            end
+
+          {{:width, comparator}, width} ->
+            case Integer.parse(width) do
+              {width, _} ->
+                # ideally something like Kernel.apply(Kernel, comparator, [q.width, ^width]), but for query
+                case comparator do
+                  :> -> dynamic([q], ^dynamic and q.width > ^width)
+                  :< -> dynamic([q], ^dynamic and q.width < ^width)
+                  :>= -> dynamic([q], ^dynamic and q.width >= ^width)
+                  :<= -> dynamic([q], ^dynamic and q.width <= ^width)
+                  :== -> dynamic([q], ^dynamic and q.width == ^width)
+                end
+
+              _ ->
+                dynamic
+            end
+
+          {{:height, comparator}, height} ->
+            case Integer.parse(height) do
+              {height, _} ->
+                case comparator do
+                  :> -> dynamic([q], ^dynamic and q.height > ^height)
+                  :< -> dynamic([q], ^dynamic and q.height < ^height)
+                  :>= -> dynamic([q], ^dynamic and q.height >= ^height)
+                  :<= -> dynamic([q], ^dynamic and q.height <= ^height)
+                  :== -> dynamic([q], ^dynamic and q.height == ^height)
+                end
+
+              _ ->
+                dynamic
+            end
+        end
+      end)
+
+    query = from query, where: ^extra_conditions
 
     filter(query, opts)
   end
