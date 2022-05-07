@@ -26,7 +26,7 @@
   </tr>
   <tr>
     <td>Image Changes</td>
-    <td><%= @n_image_changes %></td>
+    <td><%= live_redirect(@n_image_changes, to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, user_id: @user.id)) %></td>
   </tr>
   <tr>
     <td>Favorites</td>

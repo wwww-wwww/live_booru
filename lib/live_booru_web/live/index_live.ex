@@ -20,7 +20,12 @@ defmodule LiveBooruWeb.IndexLive do
   end
 
   def mount(%{"q" => q, "offset" => offset}, _session, socket) do
-    {offset, _} = Integer.parse(to_string(offset))
+    offset =
+      case Integer.parse(offset) do
+        {n, _} -> n
+        _ -> 0
+      end
+
     {images, search_metadata} = Repo.search(q, offset: offset)
 
     images =
@@ -39,14 +44,14 @@ defmodule LiveBooruWeb.IndexLive do
   end
 
   def mount(%{"q" => q}, session, socket) do
-    mount(%{"q" => q, "offset" => 0}, session, socket)
+    mount(%{"q" => q, "offset" => ""}, session, socket)
   end
 
   def mount(_params, session, socket) do
     if !is_nil(socket.assigns.current_user) and !socket.assigns.current_user.index_default_safe do
-      mount(%{"q" => "", "offset" => 0}, session, socket)
+      mount(%{"q" => "", "offset" => ""}, session, socket)
     else
-      mount(%{"q" => "-NSFW -Suggestive", "offset" => 0}, session, socket)
+      mount(%{"q" => "-NSFW -Suggestive", "offset" => ""}, session, socket)
     end
   end
 

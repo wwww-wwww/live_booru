@@ -25,12 +25,13 @@ defmodule LiveBooruWeb.Router do
       live "/queue", QueueLive
       live "/comments", CommentsLive
       live "/tags", TagListLive
+      live "/tag_changes", AllTagChangesLive
+      live "/image_changes", ImageChangesLive
 
       live "/user/:id", UserLive
 
       scope "/image" do
         live "/:id/more", ImageMoreLive
-        live "/:id/changes", ImageChangesLive
         live "/:id", ImageLive
       end
 
@@ -44,9 +45,6 @@ defmodule LiveBooruWeb.Router do
 
       scope "/" do
         pipe_through :require_admin
-
-        live "/tag_changes", AllTagChangesLive
-        live "/image_changes", AllImageChangesLive
       end
 
       scope "/" do

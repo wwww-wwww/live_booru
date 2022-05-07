@@ -125,7 +125,7 @@
 <h3>History</h3>
 <ul>
   <li>
-    <%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, @image.id)) %>
+    <%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.ImageChangesLive, image_id: @image.id)) %>
   </li>
 </ul>
 

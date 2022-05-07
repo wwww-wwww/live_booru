@@ -1,3 +1,9 @@
+input:not([type]),
+input[type="text"] {
+  background-color: rgb(36, 36, 36);
+  color: whitesmoke;
+}
+
 > div {
   background-color: rgb(30, 30, 30);
   color: whitesmoke;

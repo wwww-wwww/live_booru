@@ -189,36 +189,6 @@ nav {
       }
     }
   }
-
-  .pages {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5em;
-    gap: 0.25em;
-
-    > span {
-      border: 1px solid transparent;
-    }
-
-    > a {
-      text-decoration: none;
-      border: 1px solid lightgray;
-    }
-
-    > a:hover {
-      background-color: rgba(152, 251, 152, 0.5);
-    }
-
-    > a:active {
-      background-color: palegreen;
-    }
-
-    > * {
-      padding: 0.25em 0.5em;
-      border-radius: 0.25rem;
-    }
-  }
 }
 
 .ImageLive {
@@ -690,5 +660,52 @@ table {
 .UserLive {
   table {
     border-spacing: 0.5em;
+  }
+}
+
+.ImageChangesLive {
+  .content {
+    table.results {
+      width: 100%;
+    }
+
+    .changed_tags {
+      .added {
+        color: green;
+      }
+      .removed {
+        color: red;
+      }
+    }
+  }
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em;
+  gap: 0.25em;
+
+  > span {
+    border: 1px solid transparent;
+  }
+
+  > a {
+    text-decoration: none;
+    border: 1px solid lightgray;
+  }
+
+  > a:hover {
+    background-color: rgba(152, 251, 152, 0.5);
+  }
+
+  > a:active {
+    background-color: palegreen;
+  }
+
+  > * {
+    padding: 0.25em 0.5em;
+    border-radius: 0.25rem;
   }
 }

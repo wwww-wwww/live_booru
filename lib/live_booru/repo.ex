@@ -74,8 +74,6 @@ defmodule LiveBooru.Repo do
         :date -> order_by(query, desc: :inserted_at)
       end
 
-    count = LiveBooru.Repo.aggregate(query, :count)
-
     results =
       opts
       |> Map.new()
@@ -85,6 +83,8 @@ defmodule LiveBooru.Repo do
       end
       |> limit(@limit)
       |> Repo.all()
+
+    count = LiveBooru.Repo.aggregate(query, :count)
 
     {results, %{count: count, pages: max(ceil(count / @limit), 1), limit: @limit}}
   end
