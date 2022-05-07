@@ -45,6 +45,8 @@ defmodule LiveBooruWeb.Router do
 
       scope "/" do
         pipe_through :require_admin
+
+        live "/users", UsersLive
       end
 
       scope "/" do

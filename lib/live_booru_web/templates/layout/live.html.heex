@@ -6,6 +6,7 @@
       <%= nav_link @socket, "Image Changes", LiveBooruWeb.ImageChangesLive %>
       <%= if LiveBooru.Accounts.admin?(@current_user) do %>
         <%= nav_link @socket, "Tag Changes", LiveBooruWeb.AllTagChangesLive %>
+        <%= nav_link @socket, "Users", LiveBooruWeb.UsersLive %>
       <% end %>
       <%= nav_link @socket, "Queue", LiveBooruWeb.QueueLive %>
       <%= nav_link @socket, "Tags", LiveBooruWeb.TagListLive %>
