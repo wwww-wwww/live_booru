@@ -2,7 +2,18 @@ defmodule LiveBooruWeb.UserLive do
   use LiveBooruWeb, :live_view
 
   alias LiveBooru.Accounts.User
-  alias LiveBooru.{Repo, Image, Comment, ImageChange, TagChange, Collection, ImagesCollections}
+
+  alias LiveBooru.{
+    Repo,
+    Image,
+    Comment,
+    ImageChange,
+    TagChange,
+    Collection,
+    ImagesCollections,
+    ImageVote,
+    CommentVote
+  }
 
   import Ecto.Query, only: [from: 2]
 
@@ -45,6 +56,26 @@ defmodule LiveBooruWeb.UserLive do
           )
           |> Repo.aggregate(:count)
 
+        post_score =
+          from(v in ImageVote,
+            join: i in Image,
+            on: i.id == v.image_id,
+            where: i.user_id == ^user_id,
+            select: sum(fragment("case when ? then 1 else -1 end", v.upvote))
+          )
+          |> Repo.one()
+          |> Kernel.||(0)
+
+        comment_score =
+          from(v in CommentVote,
+            join: i in Comment,
+            on: i.id == v.comment_id,
+            where: i.user_id == ^user_id,
+            select: sum(fragment("case when ? then 1 else -1 end", v.upvote))
+          )
+          |> Repo.one()
+          |> Kernel.||(0)
+
         socket =
           socket
           |> assign(user: user)
@@ -53,6 +84,8 @@ defmodule LiveBooruWeb.UserLive do
           |> assign(n_image_changes: n_image_changes)
           |> assign(n_tag_changes: n_tag_changes)
           |> assign(n_favorites: n_favorites)
+          |> assign(post_score: post_score)
+          |> assign(comment_score: comment_score)
           |> assign(
             same_user:
               !is_nil(socket.assigns.current_user) and socket.assigns.current_user.id == user.id
