@@ -47,6 +47,7 @@ defmodule LiveBooru do
         |> Enum.map(&Repo.get_by(Tag, name: &1))
         |> Enum.map(&Tag.parents(&1))
         |> List.flatten()
+        |> Enum.uniq_by(& &1.id)
 
       Ecto.Changeset.change(image)
       |> Ecto.Changeset.put_assoc(:tags, tags)

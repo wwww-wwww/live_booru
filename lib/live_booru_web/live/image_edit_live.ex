@@ -138,7 +138,7 @@ defmodule LiveBooruWeb.ImageEditLive do
           else
             new_tags =
               Enum.map(new_tags, fn tag_name ->
-                case Repo.get_by(Tag, name: tag_name) do
+                case Repo.get_tag(tag_name) do
                   nil -> Tag.new(tag_name, :general)
                   tag -> Ecto.Changeset.change(tag)
                 end
@@ -148,6 +148,9 @@ defmodule LiveBooruWeb.ImageEditLive do
                   _ -> Repo.get_by(Tag, name: tag_name)
                 end
               end)
+              |> Enum.map(&Tag.parents(&1))
+              |> List.flatten()
+              |> Enum.uniq_by(& &1.id)
               |> Enum.sort_by(& &1.name)
 
             old_tags_ids = Enum.map(image.tags, & &1.id)
