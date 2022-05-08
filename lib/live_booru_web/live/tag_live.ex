@@ -174,7 +174,7 @@ defmodule LiveBooruWeb.TagLive do
               put_flash(socket, :error, "Tag does not exist")
 
             tag ->
-              if not Enum.any?(Tag.children(socket.assigns.tag), &(&1.id == tag.id)) do
+              if not Enum.any?(Tag.get_children(socket.assigns.tag), &(&1.id == tag.id)) do
                 change_tag(socket, %{parent_id: tag.id})
               else
                 put_flash(socket, :error, "Parent forms a cycle")

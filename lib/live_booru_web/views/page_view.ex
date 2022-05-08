@@ -130,23 +130,29 @@ defmodule LiveBooruWeb.PageView do
     end
   end
 
-  def children(socket, tag, current) do
-    tag = Repo.preload(tag, :children)
+  def children(socket, %Tag{children: %Ecto.Association.NotLoaded{}} = root, current),
+    do: children(socket, Tag.get_children(root), current)
 
+  def children(socket, root, current) do
     e =
-      if current.id == tag.id do
-        tag.name
+      if current.id == root.id do
+        content_tag(:span, class: root.type) do
+          root.name
+        end
       else
-        live_patch(tag.name, to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id))
+        live_patch(root.name,
+          to: Routes.live_path(socket, LiveBooruWeb.TagLive, root.id),
+          class: root.type
+        )
       end
 
     content_tag(:li) do
-      if length(tag.children) > 0 do
+      if length(root.children) > 0 do
         [
           e,
           content_tag(:ul) do
             Enum.map(
-              tag.children,
+              root.children,
               &children(socket, &1, current)
             )
           end

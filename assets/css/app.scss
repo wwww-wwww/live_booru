@@ -718,3 +718,11 @@ table {
     border-radius: 0.25rem;
   }
 }
+
+.TagLive {
+  .tree {
+    .category::after {
+      content: " (Category)";
+    }
+  }
+}

@@ -126,7 +126,7 @@
 
 <%= if @root.id != @tag.id or length(@tag.children) > 0 do %>
 <h2>Tree</h2>
-<ul><%= children(@socket, @root, @tag) %></ul>
+<ul class="tree"><%= children(@socket, @root, @tag) %></ul>
 <% end %>
 
 <%= live_redirect("Changes", to: Routes.live_path(@socket, LiveBooruWeb.TagChangesLive, @tag.id)) %>

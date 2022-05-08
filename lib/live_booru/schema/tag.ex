@@ -1,6 +1,10 @@
 defmodule LiveBooru.Tag do
   use Ecto.Schema
+  use Arbor.Tree
+
   import Ecto.Changeset
+
+  import Ecto.Query, only: [where: 3]
 
   alias LiveBooru.Repo
 
@@ -39,12 +43,29 @@ defmodule LiveBooru.Tag do
   end
 
   def parents(nil), do: []
-  def parents(%{type: :category}), do: []
+  def parents(%{type: :category} = tag), do: parents(Repo.preload(tag, :parent).parent)
   def parents(tag), do: [tag] ++ parents(Repo.preload(tag, :parent).parent)
 
   def root(nil), do: nil
-  def root(tag), do: root(Repo.preload(tag, :parent).parent) || tag
 
-  def children(tag),
-    do: [tag] ++ List.flatten(Enum.map(Repo.preload(tag, :children).children, &children(&1)))
+  def root(tag) do
+    ancestors(tag)
+    |> where([q], is_nil(q.parent_id))
+    |> Repo.one()
+    |> Kernel.||(tag)
+  end
+
+  def fill_tree(elements, root) do
+    %{
+      root
+      | children:
+          Enum.filter(elements, &(&1.parent_id == root.id)) |> Enum.map(&fill_tree(elements, &1))
+    }
+  end
+
+  def get_children(tag) do
+    descendants(tag)
+    |> Repo.all()
+    |> fill_tree(tag)
+  end
 end
