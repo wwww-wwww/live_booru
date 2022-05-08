@@ -8,7 +8,7 @@ defmodule LiveBooru.Tag do
     field :name, :string
 
     field :type, Ecto.Enum,
-      values: [:general, :meta, :meta_system, :copyright, :character, :artist],
+      values: [:general, :meta, :meta_system, :copyright, :character, :artist, :category],
       default: :general
 
     field :description, :string, default: ""
@@ -39,6 +39,7 @@ defmodule LiveBooru.Tag do
   end
 
   def parents(nil), do: []
+  def parents(%{type: :category}), do: []
   def parents(tag), do: [tag] ++ parents(Repo.preload(tag, :parent).parent)
 
   def root(nil), do: nil

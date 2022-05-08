@@ -2,6 +2,15 @@
 
 <h1>Tags</h1>
 
+<%= if !is_nil(@current_user) and @current_user.level >= 100 do %>
+<form phx-submit="tag_create">
+  <div>
+    <%= tag(:input, name: :name) %>
+    <%= submit("Create") %>
+  </div>
+</form>
+<% end %>
+
 <table>
 <tr>
   <th>ID</th>

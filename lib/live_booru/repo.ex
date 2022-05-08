@@ -240,7 +240,9 @@ defmodule LiveBooru.Repo do
         select: t.id
 
     from t in Tag,
-      where: (ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)
+      where:
+        ((ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)) and
+          t.type != :category
   end
 
   def get_tag(name) do
