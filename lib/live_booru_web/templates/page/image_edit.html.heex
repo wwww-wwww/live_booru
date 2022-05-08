@@ -38,11 +38,11 @@
   </div>
 
   <div>
-    <%= tag(:input, name: :value) %>
+    <%= tag(:input, id: :tag_input, name: :value, phx_hook: "edit_tab_complete") %>
     <%= submit("Create Tag") %>
   </div>
 
-  <div class="suggestions">
+  <div id="suggestions" class="suggestions">
     <%= for tag <- @suggestions do %>
     <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
     <% end %>

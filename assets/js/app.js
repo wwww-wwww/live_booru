@@ -6,7 +6,33 @@ import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
+const hooks = {
+  edit_tab_complete: {
+    mounted() {
+      this.el.addEventListener("keydown", e => {
+        if (suggestions.children.length > 0 && e.key == "Tab") {
+          const values = [...suggestions.children].map(c => c.value)
+          let index = values.indexOf(this.el.value)
+
+          if (index == -1) {
+            index = 0
+          } else {
+            index += e.shiftKey ? -1 : 1
+          }
+
+          while (index < 0) {
+            index += values.length
+          }
+
+          this.el.value = values[index % values.length]
+          e.preventDefault()
+        }
+      })
+    }
+  }
+}
+
+let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken }, hooks: hooks })
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
@@ -23,12 +49,7 @@ window.addEventListener("phx:page-loading-stop", () => {
   topbar.hide()
 })
 
-// connect if there are any LiveViews on the page
 liveSocket.connect()
 
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
-// >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 

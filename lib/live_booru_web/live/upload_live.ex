@@ -59,24 +59,21 @@ defmodule LiveBooruWeb.UploadLive do
   def handle_event("tag_q", %{"value" => value}, socket) do
     value = String.trim(value)
 
-    socket =
-      if String.length(value) > 0 do
-        suggestions =
-          from(t in Repo.build_search_tags(value),
-            where: t.type != :meta_system,
-            limit: 10
-          )
-          |> Repo.all()
-          |> Enum.map(& &1.name)
-          |> Kernel.--(MapSet.to_list(socket.assigns.tags))
-          |> Enum.sort()
+    if String.length(value) > 0 do
+      suggestions =
+        from(t in Repo.build_search_tags(value),
+          where: t.type != :meta_system,
+          order_by: t.name,
+          limit: 20,
+          select: t.name
+        )
+        |> Repo.all()
+        |> Kernel.--(MapSet.to_list(socket.assigns.tags))
 
-        assign(socket, :suggestions, suggestions)
-      else
-        socket
-      end
-
-    {:noreply, socket}
+      {:noreply, assign(socket, :suggestions, suggestions)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do

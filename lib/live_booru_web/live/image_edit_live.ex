@@ -83,23 +83,21 @@ defmodule LiveBooruWeb.ImageEditLive do
         [:meta_system]
       end
 
-    socket =
-      if String.length(value) > 0 do
-        query =
-          from t in Repo.build_search_tags(value),
-            where: t.type not in ^omit
+    if String.length(value) > 0 do
+      suggestions =
+        from(t in Repo.build_search_tags(value),
+          where: t.type not in ^omit,
+          order_by: t.name,
+          limit: 20,
+          select: t.name
+        )
+        |> Repo.all()
+        |> Kernel.--(MapSet.to_list(socket.assigns.tags))
 
-        suggestions =
-          Repo.all(query)
-          |> Enum.map(& &1.name)
-          |> Kernel.--(MapSet.to_list(socket.assigns.tags))
-
-        socket |> assign(:suggestions, suggestions)
-      else
-        socket
-      end
-
-    {:noreply, socket}
+      {:noreply, assign(socket, :suggestions, suggestions)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("validate", %{"_target" => ["source"], "source" => source}, socket) do
