@@ -47,6 +47,7 @@ defmodule LiveBooru.Repo do
       |> Enum.map(fn term ->
         case term do
           "user:" <> term -> {:user, term}
+          "user_id:" <> term -> {:user_id, term}
           "collection:" <> term -> {:collection, term}
           "width:>=" <> term -> {{:width, :>=}, term}
           "width:<=" <> term -> {{:width, :<=}, term}
@@ -159,7 +160,17 @@ defmodule LiveBooru.Repo do
     extra_conditions =
       Enum.reduce(extra, dynamic(true), fn term, dynamic ->
         case term do
-          {:user, user_id} ->
+          {:user, username} ->
+            query =
+              from i in Image,
+                join: u in User,
+                on: u.id == i.user_id,
+                where: ilike(u.name, ^username),
+                select: i.id
+
+            dynamic([q], ^dynamic and q.id in subquery(query))
+
+          {:user_id, user_id} ->
             case Integer.parse(user_id) do
               {user_id, _} -> dynamic([q], ^dynamic and q.user_id == ^user_id)
               _ -> dynamic
