@@ -15,7 +15,7 @@
   <tr>
     <td>Posts</td>
     <td>
-      <%= live_redirect(@n_images, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: "user:#{@user.id}")) %>
+      <%= live_redirect(@n_images, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: "user:#{@user.name}")) %>
     </td>
   </tr>
   <tr>

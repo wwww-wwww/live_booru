@@ -4,8 +4,6 @@ defmodule LiveBooruWeb.UsersLive do
   alias LiveBooru.Accounts.User
   alias LiveBooru.Repo
 
-  import Ecto.Query, only: [from: 2]
-
   def render(assigns) do
     LiveBooruWeb.PageView.render("users.html", assigns)
   end
