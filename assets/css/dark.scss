@@ -1,15 +1,19 @@
 input:not([type]),
 input[type="text"] {
   background-color: rgb(36, 36, 36);
-  color: whitesmoke;
+  color: gainsboro;
 }
 
 > div {
   background-color: rgb(30, 30, 30);
-  color: whitesmoke;
+  color: gainsboro;
 
   nav {
     a {
+      color: gainsboro;
+    }
+
+    a.selected {
       color: whitesmoke;
     }
 
@@ -23,12 +27,12 @@ input[type="text"] {
   .search input {
     background-color: rgb(36, 36, 36);
     border: 1px solid gray;
-    color: whitesmoke;
+    color: gainsboro;
   }
 
   .comment {
     background-color: rgb(40, 40, 40);
-    color: whitesmoke;
+    color: gainsboro;
   }
 }
 
@@ -36,7 +40,7 @@ input[type="text"] {
   .comment_form {
     textarea {
       background-color: rgb(40, 40, 40);
-      color: whitesmoke;
+      color: gainsboro;
       border: 1px solid gray;
     }
   }
@@ -82,5 +86,15 @@ input[type="text"] {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
+  }
+}
+
+.ImageChangesLive {
+  .content {
+    .changed_tags {
+      .added {
+        color: mediumseagreen;
+      }
+    }
   }
 }
