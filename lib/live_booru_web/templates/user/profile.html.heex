@@ -80,8 +80,8 @@
       </h3>
       <div>Type: <%= collection.type %></div>
       <div>
-        <%= for image <- collection.images do %>
-          <%= image(@socket, assigns, image) %>
+        <%= for ic <- collection.image_collection |> Enum.sort_by(& &1.inserted_at, :desc) |> Enum.take(4) do %>
+          <%= image(@socket, assigns, ic.image) %>
         <% end %>
       </div>
     </div>

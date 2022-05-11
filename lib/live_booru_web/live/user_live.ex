@@ -23,7 +23,7 @@ defmodule LiveBooruWeb.UserLive do
 
   def mount(%{"id" => id}, _, socket) do
     Repo.get(User, id)
-    |> Repo.preload(collections: :images)
+    |> Repo.preload(collections: [image_collection: :image])
     |> case do
       nil ->
         {:ok,
@@ -127,11 +127,18 @@ defmodule LiveBooruWeb.UserLive do
 
   def handle_event("settings", %{"user" => attrs}, socket) do
     if socket.assigns.same_user do
-      Ecto.Changeset.cast(socket.assigns.changeset, attrs, [:index_default_safe, :theme])
-      |> Repo.update()
-      |> case do
-        {:ok, user} -> {:noreply, assign(socket, changeset: Ecto.Changeset.change(user))}
-        _ -> {:noreply, socket}
+      cs = Ecto.Changeset.cast(socket.assigns.changeset, attrs, [:index_default_safe, :theme])
+
+      case Repo.update(cs) do
+        {:ok, user} ->
+          if Map.has_key?(cs.changes, :theme) do
+            {:noreply, redirect(socket, to: Routes.live_path(socket, __MODULE__, user.id))}
+          else
+            {:noreply, assign(socket, changeset: Ecto.Changeset.change(user))}
+          end
+
+        _ ->
+          {:noreply, socket}
       end
     else
       {:noreply, socket}
