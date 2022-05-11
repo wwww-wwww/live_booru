@@ -6,7 +6,7 @@ defmodule LiveBooru.Repo do
   @limit 40
 
   alias LiveBooru.Accounts.User
-  alias LiveBooru.{Repo, ImagesTags, Tag, Image, Collection, ImagesCollections}
+  alias LiveBooru.{Repo, ImagesTags, Tag, Image, Collection, ImagesCollections, ImageVote}
 
   import Ecto.Query,
     only: [
@@ -40,7 +40,7 @@ defmodule LiveBooru.Repo do
   @re_search ~r/((?:-{0,1}|[^ ]*?:)\"(?:\\\"|.)*?\"|[^ ]+)/iu
 
   def parse_terms(query) do
-    {terms_include, terms_exclude, terms_extra} =
+    {terms_include, terms_exclude, terms_extra, order} =
       Regex.scan(@re_search, query)
       |> Enum.map(&Enum.at(&1, 1))
       |> Enum.map(&String.downcase(&1))
@@ -59,6 +59,7 @@ defmodule LiveBooru.Repo do
           "height:>" <> term -> {{:height, :>}, term}
           "height:<" <> term -> {{:height, :<}, term}
           "height:" <> term -> {{:height, :==}, term}
+          "order:" <> term -> {:order, term}
           "-" <> term -> {:exclude, term}
           term -> {:include, term}
         end
@@ -74,23 +75,53 @@ defmodule LiveBooru.Repo do
       end)
       |> Enum.map(&{elem(&1, 0), String.replace(elem(&1, 1), "\\\"", "\"")})
       |> Enum.filter(&(String.length(elem(&1, 1)) > 0))
-      |> Enum.reduce({[], [], []}, fn {term_type, term}, {include, exclude, extra} ->
+      |> Enum.reduce({[], [], [], nil}, fn {term_type, term}, {include, exclude, extra, order} ->
         case term_type do
-          :include -> {include ++ [term], exclude, extra}
-          :exclude -> {include, exclude ++ [term], extra}
-          _ -> {include, exclude, extra ++ [{term_type, term}]}
+          :include -> {include ++ [term], exclude, extra, order}
+          :exclude -> {include, exclude ++ [term], extra, order}
+          :order -> {include, exclude, extra, term}
+          _ -> {include, exclude, extra ++ [{term_type, term}], order}
         end
       end)
 
-    {Enum.uniq(terms_include), Enum.uniq(terms_exclude), Enum.uniq(terms_extra)}
+    {Enum.uniq(terms_include), Enum.uniq(terms_exclude), Enum.uniq(terms_extra), order}
   end
 
   def filter(query, opts \\ []) do
-    query = order_by(query, desc: :id)
+    count = LiveBooru.Repo.aggregate(query, :count)
 
     query =
-      case Keyword.get(opts, :order, :date) do
-        :date -> order_by(query, desc: :inserted_at)
+      case opts[:order] do
+        "oldest" ->
+          order_by(query, asc: :inserted_at)
+
+        "score" <> order ->
+          order =
+            case order do
+              "_asc" -> :asc
+              "_desc" -> :desc
+              _ -> :desc
+            end
+
+          from(i in query,
+            left_join: iv in ImageVote,
+            on: i.id == iv.image_id,
+            group_by: i.id,
+            order_by: [
+              {^order,
+               sum(
+                 fragment(
+                   "case when ? then 0 when ? then 1 else -1 end",
+                   is_nil(iv.upvote),
+                   iv.upvote
+                 )
+               )},
+              desc: i.inserted_at
+            ]
+          )
+
+        _ ->
+          order_by(query, desc: :inserted_at)
       end
 
     results =
@@ -102,8 +133,6 @@ defmodule LiveBooru.Repo do
       end
       |> limit(@limit)
       |> Repo.all()
-
-    count = LiveBooru.Repo.aggregate(query, :count)
 
     {results, %{count: count, pages: max(ceil(count / @limit), 1), limit: @limit}}
   end
@@ -117,7 +146,7 @@ defmodule LiveBooru.Repo do
   end
 
   def search(query, opts) do
-    {inc, exc, extra} = Repo.parse_terms(query)
+    {inc, exc, extra, order} = Repo.parse_terms(query)
 
     query =
       case {inc, exc} do
@@ -225,7 +254,7 @@ defmodule LiveBooru.Repo do
 
     query = from query, where: ^extra_conditions
 
-    filter(query, opts)
+    filter(query, Keyword.merge(opts, order: order))
   end
 
   def build_search_tags(query) do
