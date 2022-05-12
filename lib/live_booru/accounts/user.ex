@@ -9,7 +9,7 @@ defmodule LiveBooru.Accounts.User do
     field(:level, :integer)
 
     field(:index_default_safe, :boolean, default: true)
-    field(:theme, Ecto.Enum, values: [:default, :dark], default: :default)
+    field(:theme, Ecto.Enum, values: [:default, :light, :dark], default: :default)
 
     has_many(:collections, LiveBooru.Collection)
     has_many(:uploads, LiveBooru.Upload)
