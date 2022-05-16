@@ -4,6 +4,10 @@ input[type="text"] {
   color: gainsboro;
 }
 
+a {
+  color: skyblue;
+}
+
 > div {
   background-color: rgb(30, 30, 30);
   color: gainsboro;
@@ -18,10 +22,6 @@ input[type="text"] {
     }
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
-  a {
-    color: skyblue;
   }
 
   .search input {
