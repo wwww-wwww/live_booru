@@ -23,6 +23,99 @@ defmodule LiveBooru.Encoder do
     {:noreply, state}
   end
 
+  def supported_format?(:jxl), do: :jxl
+  def supported_format?("JPEG"), do: true
+  def supported_format?("PNG"), do: true
+  def supported_format?("GIF"), do: true
+  def supported_format?("WEBP"), do: true
+  def supported_format?(_), do: false
+
+  def process(:jxl, job) do
+    decoded = job.path <> ".png"
+
+    case Uploader.decode_jxl(job.path, decoded, &Uploader.get_hash/1) do
+      {:ok, png_hash} ->
+        # if png of jxl exists, remember jxl
+        if upload = Repo.get_by(Upload, hash: png_hash) |> Repo.preload(:image) do
+          create_upload(upload.image, job)
+          File.rm(job.path)
+          WorkerManager.finish(EncoderManager, job)
+        else
+          if pixels_hash = Uploader.get_pixels_hash(decoded) do
+            # if pixels of jxl exists, remember jxl
+            if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
+              create_upload(image, job)
+              File.rm(job.path)
+              WorkerManager.finish(EncoderManager, job)
+            else
+              create_image(job, job.hash, pixels_hash, job.path, decoded)
+            end
+          end
+        end
+
+        File.rm(decoded)
+
+      err ->
+        IO.inspect(err)
+    end
+  end
+
+  def process(true, job) do
+    if pixels_hash = Uploader.get_pixels_hash(job.path) do
+      # if pixels of image exists, remember image
+      if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
+        create_upload(image, job)
+        File.rm(job.path)
+        WorkerManager.finish(EncoderManager, job)
+      else
+        case System.cmd("python3", ["encode.py", job.path, job.path <> ".f.jxl"]) do
+          {output, 0} ->
+            [version, params | _] = String.split(output, "\n")
+
+            if hash = Uploader.get_hash(job.path <> ".f.jxl") do
+              decoded = job.path <> ".f.jxl.png"
+
+              case Uploader.decode_jxl(
+                     job.path <> ".f.jxl",
+                     decoded,
+                     &Uploader.get_pixels_hash/1
+                   ) do
+                {:ok, new_pixels_hash} ->
+                  create_image(
+                    job,
+                    hash,
+                    new_pixels_hash,
+                    job.path <> ".f.jxl",
+                    decoded,
+                    {version, params},
+                    fn image ->
+                      create_upload(image, job)
+                      File.rm(job.path)
+                      File.rm(decoded)
+                    end
+                  )
+
+                err ->
+                  IO.inspect(err)
+              end
+
+              File.rm(decoded)
+            else
+              IO.inspect(output)
+            end
+
+          err ->
+            IO.inspect(err)
+        end
+      end
+    end
+  end
+
+  def process(false, job) do
+    File.rm(job.path)
+    WorkerManager.finish(EncoderManager, job)
+  end
+
   def handle_cast(:loop, state) do
     case WorkerManager.pop(EncoderManager, sort_by: &{not &1.is_jxl, &1.id}, order: :asc) do
       :empty ->
@@ -34,100 +127,9 @@ defmodule LiveBooru.Encoder do
         if Uploader.exists?(job.hash) do
           WorkerManager.finish(EncoderManager, job)
         else
-          in_path = Path.join("tmp", job.hash)
-
-          if LiveBooru.Jxl.path_is_jxl?(in_path) do
-            decoded = in_path <> ".png"
-
-            case Uploader.decode_jxl(in_path, decoded, &Uploader.get_hash/1) do
-              {:ok, png_hash} ->
-                # if png of jxl exists, remember jxl
-                if upload = Repo.get_by(Upload, hash: png_hash) |> Repo.preload(:image) do
-                  create_upload(upload.image, job)
-                  File.rm(in_path)
-                  WorkerManager.finish(EncoderManager, job)
-                else
-                  if pixels_hash = Uploader.get_pixels_hash(decoded) do
-                    # if pixels of jxl exists, remember jxl
-                    if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
-                      create_upload(image, job)
-                      File.rm(in_path)
-                      WorkerManager.finish(EncoderManager, job)
-                    else
-                      create_image(job, job.hash, pixels_hash, in_path, decoded)
-                    end
-                  end
-                end
-
-                File.rm(decoded)
-
-              err ->
-                IO.inspect(err)
-            end
-          else
-            case Uploader.get_format(in_path) do
-              "JPEG" -> true
-              "PNG" -> true
-              "GIF" -> true
-              "WEBP" -> true
-              _ -> nil
-            end
-            |> case do
-              nil ->
-                File.rm(in_path)
-                WorkerManager.finish(EncoderManager, job)
-
-              true ->
-                if pixels_hash = Uploader.get_pixels_hash(in_path) do
-                  # if pixels of image exists, remember image
-                  if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
-                    create_upload(image, job)
-                    File.rm(in_path)
-                    WorkerManager.finish(EncoderManager, job)
-                  else
-                    case System.cmd("python3", ["encode.py", in_path, in_path <> ".f.jxl"]) do
-                      {output, 0} ->
-                        [version, params | _] = String.split(output, "\n")
-
-                        if hash = Uploader.get_hash(in_path <> ".f.jxl") do
-                          decoded = in_path <> ".f.jxl.png"
-
-                          case Uploader.decode_jxl(
-                                 in_path <> ".f.jxl",
-                                 decoded,
-                                 &Uploader.get_pixels_hash/1
-                               ) do
-                            {:ok, new_pixels_hash} ->
-                              create_image(
-                                job,
-                                hash,
-                                new_pixels_hash,
-                                in_path <> ".f.jxl",
-                                decoded,
-                                {version, params},
-                                fn image ->
-                                  create_upload(image, job)
-                                  File.rm(in_path)
-                                  File.rm(decoded)
-                                end
-                              )
-
-                            err ->
-                              IO.inspect(err)
-                          end
-
-                          File.rm(decoded)
-                        else
-                          IO.inspect(output)
-                        end
-
-                      err ->
-                        IO.inspect(err)
-                    end
-                  end
-                end
-            end
-          end
+          Uploader.get_format(job.path)
+          |> supported_format?()
+          |> process(job)
         end
 
         GenServer.cast(self(), :loop)
@@ -228,9 +230,7 @@ defmodule LiveBooru.Encoder do
   end
 
   def create_upload(image, job) do
-    file = Path.join("tmp", job.hash)
-
-    %Upload{hash: job.hash, filesize: File.stat!(file).size}
+    %Upload{hash: job.hash, filesize: File.stat!(job.path).size}
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, job.user)
     |> Ecto.Changeset.put_assoc(:image, image)

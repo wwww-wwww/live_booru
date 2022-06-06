@@ -110,11 +110,12 @@ defmodule LiveBooruWeb.UploadLive do
       if Uploader.exists?(hash) or Uploader.job_exists?(hash) do
         {:ok, "File already exists"}
       else
-        File.cp(path, "tmp/#{hash}")
+        File.cp(path, Path.join("tmp", hash))
         |> case do
           :ok ->
             %EncodeJob{
               hash: hash,
+              path: Path.join("tmp", hash),
               tags: MapSet.to_list(socket.assigns.tags) ++ rating_tag,
               source: source,
               title: title,
