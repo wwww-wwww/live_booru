@@ -5,6 +5,8 @@ defmodule LiveBooru.Encoder do
 
   alias LiveBooru.{WorkerManager, EncoderManager, Uploader, Repo, Upload, Image, Tag, Collection}
 
+  @cjxl_args ["-q", "100", "-e", "9", "-E", "3", "-I", "1"]
+
   defstruct id: nil, active: false
 
   def start_link(opts) do
@@ -24,11 +26,64 @@ defmodule LiveBooru.Encoder do
   end
 
   def supported_format?(:jxl), do: :jxl
-  def supported_format?("JPEG"), do: true
+  def supported_format?("JPEG"), do: :jpeg
   def supported_format?("PNG"), do: true
   def supported_format?("GIF"), do: true
   def supported_format?("WEBP"), do: true
   def supported_format?(_), do: false
+
+  def encode(path_in, path_out, extra_args) do
+    args = @cjxl_args ++ extra_args
+
+    case System.cmd("cjxl", args ++ [path_in, path_out], stderr_to_stdout: true) do
+      {output, 0} ->
+        case File.stat(path_out) do
+          {:ok, %{size: size}} -> {:ok, {size, path_out, args, output}}
+          {:error, err} -> {:error, {:stat, err}}
+        end
+
+      err ->
+        {:error, err}
+    end
+  end
+
+  def best_encode(format, path_in, path_out) do
+    [[path_in, path_in <> ".jxl", []]]
+    |> Kernel.++(if format == :jpeg, do: [[path_in, path_in <> ".j.jxl", ["-j"]]], else: [])
+    |> Enum.reduce_while([], fn args, acc ->
+      case apply(__MODULE__, :encode, args) do
+        {:ok, resp} -> {:cont, acc ++ [resp]}
+        err -> {:halt, err}
+      end
+    end)
+    |> case do
+      {:error, err} ->
+        err
+
+      results ->
+        results = Enum.sort_by(results, &elem(&1, 0), :asc)
+
+        case Enum.at(results, 0) do
+          nil ->
+            {:error, :nothing}
+
+          {size, path, params, output} ->
+            case File.cp(path, path_out) do
+              :ok ->
+                Enum.each(results, &File.rm(elem(&1, 1)))
+
+                version = output |> String.split("\n") |> Enum.at(0)
+                params = Enum.join(params, " ")
+                hash = Uploader.get_hash(path_out)
+
+                {:ok, size, version, params, hash}
+
+              err ->
+                err
+            end
+        end
+    end
+  end
 
   def process(:jxl, job) do
     decoded = job.path <> ".png"
@@ -48,7 +103,8 @@ defmodule LiveBooru.Encoder do
               File.rm(job.path)
               WorkerManager.finish(EncoderManager, job)
             else
-              create_image(job, job.hash, pixels_hash, job.path, decoded)
+              size = File.stat!(job.path).size
+              create_image(job, job.hash, pixels_hash, size, job.path, decoded)
             end
           end
         end
@@ -60,7 +116,12 @@ defmodule LiveBooru.Encoder do
     end
   end
 
-  def process(true, job) do
+  def process(false, job) do
+    File.rm(job.path)
+    WorkerManager.finish(EncoderManager, job)
+  end
+
+  def process(format, job) do
     if pixels_hash = Uploader.get_pixels_hash(job.path) do
       # if pixels of image exists, remember image
       if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
@@ -68,52 +129,42 @@ defmodule LiveBooru.Encoder do
         File.rm(job.path)
         WorkerManager.finish(EncoderManager, job)
       else
-        case System.cmd("python3", ["encode.py", job.path, job.path <> ".f.jxl"]) do
-          {output, 0} ->
-            [version, params | _] = String.split(output, "\n")
+        case best_encode(format, job.path, job.path <> ".f.jxl") do
+          {:ok, size, version, params, hash} when not is_nil(hash) ->
+            decoded = job.path <> ".f.jxl.png"
 
-            if hash = Uploader.get_hash(job.path <> ".f.jxl") do
-              decoded = job.path <> ".f.jxl.png"
+            case Uploader.decode_jxl(
+                   job.path <> ".f.jxl",
+                   decoded,
+                   &Uploader.get_pixels_hash/1
+                 ) do
+              {:ok, new_pixels_hash} ->
+                create_image(
+                  job,
+                  hash,
+                  new_pixels_hash,
+                  size,
+                  job.path <> ".f.jxl",
+                  decoded,
+                  {version, params},
+                  fn image ->
+                    create_upload(image, job)
+                    File.rm(job.path)
+                    File.rm(decoded)
+                  end
+                )
 
-              case Uploader.decode_jxl(
-                     job.path <> ".f.jxl",
-                     decoded,
-                     &Uploader.get_pixels_hash/1
-                   ) do
-                {:ok, new_pixels_hash} ->
-                  create_image(
-                    job,
-                    hash,
-                    new_pixels_hash,
-                    job.path <> ".f.jxl",
-                    decoded,
-                    {version, params},
-                    fn image ->
-                      create_upload(image, job)
-                      File.rm(job.path)
-                      File.rm(decoded)
-                    end
-                  )
-
-                err ->
-                  IO.inspect(err)
-              end
-
-              File.rm(decoded)
-            else
-              IO.inspect(output)
+              err ->
+                IO.inspect(err)
             end
+
+            File.rm(decoded)
 
           err ->
             IO.inspect(err)
         end
       end
     end
-  end
-
-  def process(false, job) do
-    File.rm(job.path)
-    WorkerManager.finish(EncoderManager, job)
   end
 
   def handle_cast(:loop, state) do
@@ -143,6 +194,7 @@ defmodule LiveBooru.Encoder do
         job,
         hash,
         pixels_hash,
+        size,
         file,
         decoded,
         {version, params} \\ {nil, nil},
@@ -190,7 +242,7 @@ defmodule LiveBooru.Encoder do
       hash: hash,
       pixels_hash: pixels_hash,
       path: out_path,
-      filesize: File.stat!(file).size,
+      filesize: size,
       width: width,
       height: height,
       source: job.source,
