@@ -4,6 +4,7 @@ defmodule LiveBooru.Upload do
   schema "uploads" do
     field :hash, :string
     field :filesize, :integer
+    field :filetype, :string
 
     belongs_to :image, LiveBooru.Image
     belongs_to :user, LiveBooru.Accounts.User

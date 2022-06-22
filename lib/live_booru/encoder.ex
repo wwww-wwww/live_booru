@@ -92,14 +92,14 @@ defmodule LiveBooru.Encoder do
       {:ok, png_hash} ->
         # if png of jxl exists, remember jxl
         if upload = Repo.get_by(Upload, hash: png_hash) |> Repo.preload(:image) do
-          create_upload(upload.image, job)
+          create_upload(upload.image, job, :jxl)
           File.rm(job.path)
           WorkerManager.finish(EncoderManager, job)
         else
           if pixels_hash = Uploader.get_pixels_hash(decoded) do
             # if pixels of jxl exists, remember jxl
             if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
-              create_upload(image, job)
+              create_upload(image, job, :jxl)
               File.rm(job.path)
               WorkerManager.finish(EncoderManager, job)
             else
@@ -125,7 +125,7 @@ defmodule LiveBooru.Encoder do
     if pixels_hash = Uploader.get_pixels_hash(job.path) do
       # if pixels of image exists, remember image
       if image = Repo.get_by(Image, pixels_hash: pixels_hash) do
-        create_upload(image, job)
+        create_upload(image, job, format)
         File.rm(job.path)
         WorkerManager.finish(EncoderManager, job)
       else
@@ -148,7 +148,7 @@ defmodule LiveBooru.Encoder do
                   decoded,
                   {version, params},
                   fn image ->
-                    create_upload(image, job)
+                    create_upload(image, job, format)
                     File.rm(job.path)
                     File.rm(decoded)
                   end
@@ -281,8 +281,8 @@ defmodule LiveBooru.Encoder do
     end
   end
 
-  def create_upload(image, job) do
-    %Upload{hash: job.hash, filesize: File.stat!(job.path).size}
+  def create_upload(image, job, format) do
+    %Upload{hash: job.hash, filesize: File.stat!(job.path).size, filetype: to_string(format)}
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, job.user)
     |> Ecto.Changeset.put_assoc(:image, image)

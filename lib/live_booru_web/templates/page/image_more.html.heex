@@ -21,8 +21,10 @@
   <li>
     <%= upload.hash %>
     <ul>
+      <li>User: <%= live_redirect(upload.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, upload.user.id)) %></li>
       <li>Date: <%= Timex.from_now(upload.inserted_at) %></li>
       <li>Size: <%= Size.humanize!(upload.filesize) %></li>
+      <li>File type: <%= upload.filetype || "Unknown" %></li>
     </ul>
   </li>
   <% end %>
