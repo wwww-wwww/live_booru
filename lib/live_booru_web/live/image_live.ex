@@ -57,7 +57,7 @@ defmodule LiveBooruWeb.ImageLive do
 
         collections =
           Repo.get_collections(image)
-          |> Repo.preload(:images)
+          |> Repo.preload([:images, :user])
 
         socket =
           socket

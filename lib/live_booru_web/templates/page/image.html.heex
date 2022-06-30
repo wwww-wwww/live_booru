@@ -182,9 +182,22 @@
 <div>
   <%= for collection <- @collections do %>
   <div class="collection">
-    <%= for image <- collection.images do %>
-    <%= image(@socket, assigns, image) %>
-    <% end %>
+    <div class="title">
+      <%= live_redirect(collection.name, to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: "collection:#{collection.id}")) %>
+      (<%= length(collection.images) %>)
+      -
+      <%= live_redirect(collection.user.name, to: Routes.live_path(@socket, LiveBooruWeb.UserLive, collection.user.id)) %>
+    </div>
+    <div class="images">
+      <%= for image <- Enum.take(collection.images, 6) do %>
+        <%= image(@socket, assigns, image) %>
+      <% end %>
+      <%= if length(collection.images) > 6 do %>
+        <div class="more">
+          <%= live_redirect("More", to: Routes.live_path(@socket, LiveBooruWeb.IndexLive, q: "collection:#{collection.id}")) %>
+        </div>
+      <% end %>
+    </div>
   </div>
   <% end %>
 </div>

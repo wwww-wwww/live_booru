@@ -14,6 +14,11 @@ body {
 }
 
 body {
+  --background: white;
+  --foreground: black;
+  --highlight: rgb(193, 250, 193);
+  --input-background: white;
+
   margin: 0;
   font-family: "Segoe UI", Helvetica, Arial, sans-serif;
 
@@ -22,6 +27,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: auto;
+    color: var(--foreground);
   }
 
   a {
@@ -214,11 +220,25 @@ nav {
   }
 
   .collection {
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
+    padding: 0.5em;
     display: flex;
+    flex-direction: column;
     gap: 0.5em;
+    border-radius: 0.25rem;
 
-    .selected {
-      border: 1px solid orange;
+    .title {
+      font-weight: bold;
+    }
+
+    .images {
+      display: flex;
+      gap: 0.5em;
+      overflow-x: auto;
+
+      .selected {
+        border: 1px solid orange;
+      }
     }
   }
 
@@ -413,6 +433,12 @@ nav {
 
 button.icon {
   cursor: pointer;
+}
+
+input:not([type]),
+input[type="text"] {
+  background-color: var(--input-background);
+  color: var(--foreground);
 }
 
 input[type="submit"],

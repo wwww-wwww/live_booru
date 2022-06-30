@@ -1,16 +1,14 @@
-input:not([type]),
-input[type="text"] {
-  background-color: rgb(36, 36, 36);
-  color: gainsboro;
-}
-
 a {
   color: skyblue;
 }
 
 > div {
+  --background: rgb(30, 30, 30);
+  --foreground: gainsboro;
+  --input-background: rgb(36, 36, 36);
+  --highlight: rgb(56, 56, 56);
+
   background-color: rgb(30, 30, 30);
-  color: gainsboro;
 
   nav {
     a {

@@ -86,29 +86,7 @@ defmodule LiveBooruWeb.PageView do
     end
   end
 
-  def tag_link(socket, tag, count, search) do
-    [a, b, c] = tag_link(socket, tag, count)
-
-    [
-      a,
-      live_patch("+",
-        to:
-          Routes.live_path(socket, LiveBooruWeb.IndexLive,
-            q: String.trim("#{search} #{quote_tag(tag)}")
-          )
-      ),
-      live_patch("-",
-        to:
-          Routes.live_path(socket, LiveBooruWeb.IndexLive,
-            q: String.trim("#{search} -#{quote_tag(tag)}")
-          )
-      ),
-      b,
-      c
-    ]
-  end
-
-  def tag_link(socket, tag, count) do
+  def tag_link(socket, tag, count, true) do
     [
       live_patch("?", to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id)),
       live_patch(tag.name,
@@ -118,6 +96,37 @@ defmodule LiveBooruWeb.PageView do
         count
       end
     ]
+  end
+
+  def tag_link(socket, tag, count, search) do
+    [a, b, c] = tag_link(socket, tag, count, true)
+
+    assigns = %{
+      elements: [
+        a,
+        live_patch("+",
+          to:
+            Routes.live_path(socket, LiveBooruWeb.IndexLive,
+              q: String.trim("#{search} #{quote_tag(tag)}")
+            )
+        ),
+        live_patch("-",
+          to:
+            Routes.live_path(socket, LiveBooruWeb.IndexLive,
+              q: String.trim("#{search} -#{quote_tag(tag)}")
+            )
+        ),
+        b,
+        c
+      ]
+    }
+
+    ~H"<%= for e <- @elements do %><%= e %><% end %>"
+  end
+
+  def tag_link(socket, tag, count) do
+    assigns = %{elements: tag_link(socket, tag, count, true)}
+    ~H"<%= for e <- @elements do %><%= e %><% end %>"
   end
 
   def score(image), do: Enum.reduce(image.votes, 0, &if(&1.upvote, do: &2 + 1, else: &2 - 1))
@@ -147,19 +156,24 @@ defmodule LiveBooruWeb.PageView do
       end
 
     content_tag(:li) do
-      if length(root.children) > 0 do
-        [
-          e,
-          content_tag(:ul) do
-            Enum.map(
-              root.children,
-              &children(socket, &1, current)
-            )
-          end
-        ]
-      else
-        e
-      end
+      elements =
+        if length(root.children) > 0 do
+          [
+            e,
+            content_tag(:ul) do
+              Enum.map(
+                root.children,
+                &children(socket, &1, current)
+              )
+            end
+          ]
+        else
+          [e]
+        end
+
+      assigns = %{elements: elements}
+
+      ~H"<%= for e <- @elements do %><%= e %><% end %>"
     end
   end
 end
