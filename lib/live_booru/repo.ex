@@ -39,10 +39,14 @@ defmodule LiveBooru.Repo do
 
   @re_search ~r/((?:-{0,1}|[^ ]*?:)\"(?:\\\"|.)*?\"|[^ ]+)/iu
 
+  def separate_terms(query) do
+    Regex.scan(@re_search, query)
+    |> Enum.map(&Enum.at(&1, 1))
+  end
+
   def parse_terms(query) do
     {terms_include, terms_exclude, terms_extra, order} =
-      Regex.scan(@re_search, query)
-      |> Enum.map(&Enum.at(&1, 1))
+      separate_terms(query)
       |> Enum.map(&String.downcase(&1))
       |> Enum.map(fn term ->
         case term do

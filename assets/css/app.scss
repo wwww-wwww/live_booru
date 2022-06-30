@@ -474,6 +474,42 @@ button {
     display: flex;
     gap: 0.5em;
 
+    > div:focus-within > .suggestions {
+      display: flex;
+    }
+
+    .suggestions {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      width: calc(100% - 2px);
+      background-color: var(--input-background);
+      border: 1px solid gray;
+      font-size: 0.9em;
+      z-index: 2;
+
+      > a {
+        padding: 0.25em 0.5em;
+        text-decoration: none;
+        display: flex;
+
+        :first-child {
+          flex: 1;
+        }
+      }
+
+      > a:hover {
+        background-color: var(--highlight);
+      }
+    }
+
+    > div {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
     input {
       flex: 1;
       border: 1px solid lightgrey;
