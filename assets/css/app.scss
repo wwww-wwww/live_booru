@@ -474,7 +474,7 @@ button {
     display: flex;
     gap: 0.5em;
 
-    > div:focus-within > .suggestions {
+    > div:focus-within > .suggestions:not(.empty) {
       display: flex;
     }
 
@@ -485,9 +485,11 @@ button {
       top: 100%;
       width: calc(100% - 2px);
       background-color: var(--input-background);
-      border: 1px solid gray;
       font-size: 0.9em;
       z-index: 2;
+      border: 1px solid gray;
+      max-height: min(calc(100vh - 6em), 20em);
+      overflow-y: auto;
 
       > a {
         padding: 0.25em 0.5em;

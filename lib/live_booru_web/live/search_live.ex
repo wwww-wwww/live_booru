@@ -6,9 +6,26 @@ defmodule LiveBooruWeb.SearchLive do
   # import Phoenix.LiveView.Helpers
   # alias LiveBooruWeb.Router.Helpers, as: Routes
 
-  import Ecto.Query, only: [from: 2, limit: 2]
+  import Ecto.Query, only: [from: 2]
 
   alias LiveBooru.Repo
+
+  @meta_tags [
+    {"user:", :meta, ""},
+    {"user_id:", :meta, ""},
+    {"collection:", :meta, ""},
+    {"width:>=", :meta, ""},
+    {"width:<=", :meta, ""},
+    {"width:>", :meta, ""},
+    {"width:<", :meta, ""},
+    {"width:", :meta, ""},
+    {"height:>=", :meta, ""},
+    {"height:<=", :meta, ""},
+    {"height:>", :meta, ""},
+    {"height:<", :meta, ""},
+    {"height:", :meta, ""},
+    {"order:", :meta, ""}
+  ]
 
   def render(assigns) do
     LiveBooruWeb.PageView.render("search.html", assigns)
@@ -42,12 +59,9 @@ defmodule LiveBooruWeb.SearchLive do
     end
   end
 
-  defp strip_modifier(query) do
-    case query do
-      "-" <> query -> strip_modifier(query)
-      "\"" <> query -> strip_modifier(query)
-      query -> query
-    end
+  defp extra_suggestions(query, suggestions) do
+    IO.inspect(query)
+    (@meta_tags |> Enum.filter(&String.contains?(elem(&1, 0), query))) ++ suggestions
   end
 
   def handle_event("suggest", %{"query" => query}, socket) do
@@ -56,6 +70,12 @@ defmodule LiveBooruWeb.SearchLive do
     socket =
       terms
       |> Enum.take(-2)
+      |> Enum.map(
+        &case &1 do
+          "-" <> query -> query
+          _ -> &1
+        end
+      )
       |> case do
         ["\"" <> a, b] ->
           if not String.ends_with?(a, "\"") do
@@ -69,22 +89,24 @@ defmodule LiveBooruWeb.SearchLive do
       end
       |> Enum.at(-1)
       |> String.slice(0..-2)
-      |> strip_modifier()
+      |> case do
+        "\"" <> query -> query
+        query -> query
+      end
       |> case do
         "" ->
           assign(socket, suggestions: [])
 
         incomplete ->
-          subq =
-            from(t in Repo.build_search_tags(incomplete),
-              order_by: t.name
-            )
+          subq = from(t in Repo.build_search_tags(incomplete), order_by: t.name)
 
           complete = Enum.drop(terms, -1) |> Enum.map(&remove_quotes/1)
 
           suggestions =
-            from(t in subq, where: fragment("lower(?)", t.name) not in ^complete)
-            |> limit(10)
+            from(t in subq,
+              where: fragment("lower(?)", t.name) not in ^complete,
+              limit: 10
+            )
 
           suggestions =
             from(t in suggestions,
@@ -95,7 +117,7 @@ defmodule LiveBooruWeb.SearchLive do
             )
             |> Repo.all()
 
-          assign(socket, suggestions: suggestions)
+          assign(socket, suggestions: extra_suggestions(incomplete, suggestions))
       end
 
     {:noreply, socket}

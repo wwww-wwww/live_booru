@@ -2,17 +2,17 @@
 
 <form phx-submit="search" phx-target={assigns[:myself]} phx-change="suggest">
   <div>
-    <%= tag(:input, name: :query, autocomplete: "off", value: @q) %>
-    <%= if not is_nil(assigns[:suggestions]) and length(assigns[:suggestions]) > 0 do %>
-      <div class="suggestions tags">
+    <%= tag(:input, id: "search_input", name: :query, autocomplete: "off", value: @q) %>
+    <div id="search_suggestions" class="suggestions tags" phx-hook="search_suggestions">
+      <%= if not is_nil(assigns[:suggestions]) do %>
         <%= for {suggestion, type, count} <- @suggestions do %>
-          <a href="#" class={type}>
+          <a href="#" class={type} data-name={suggestion}>
             <span><%= suggestion %></span>
             <span><%= count %></span>
           </a>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
   <%= submit("Search") %>
 </form>
