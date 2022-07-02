@@ -7,6 +7,7 @@ a {
   --foreground: gainsboro;
   --input-background: rgb(36, 36, 36);
   --highlight: rgb(56, 56, 56);
+  --green: mediumseagreen;
 
   background-color: rgb(30, 30, 30);
 
@@ -64,35 +65,14 @@ a {
 .UploadLive,
 .ImageEditLive {
   .suggestions,
-  .tags {
+  .form_tags .tags {
     > button {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-      padding: 0.5em;
-      cursor: pointer;
-      border: none;
-      border-radius: 100vh;
       background-color: rgb(48, 48, 48);
       color: lightgray;
     }
 
     > button:hover {
       background-color: rgb(64, 64, 64);
-    }
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
-  }
-}
-
-.ImageChangesLive {
-  .content {
-    .changed_tags {
-      .added {
-        color: mediumseagreen;
-      }
     }
   }
 }

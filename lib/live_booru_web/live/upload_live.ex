@@ -21,14 +21,30 @@ defmodule LiveBooruWeb.UploadLive do
       |> allow_upload(:file,
         accept: ~w(.jxl .jpg .jpeg .png .webp .gif),
         max_entries: 1,
-        max_file_size: 50_000_000
+        max_file_size: 50_000_000,
+        progress: &handle_progress/3,
+        auto_upload: true
       )
+      |> assign(:autotag_suggestions, [])
 
     {:ok, socket}
   end
 
   def handle_params(_params, _session, socket) do
     {:noreply, socket}
+  end
+
+  defp handle_progress(:file, entry, socket) do
+    if entry.done? do
+      tags =
+        consume_uploaded_entry(socket, entry, fn %{path: path} ->
+          {:postpone, LiveBooru.AutoTag.autotag(path)}
+        end)
+
+      {:noreply, assign(socket, :autotag_suggestions, tags)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("tag_remove", %{"value" => tag_id}, socket) do
@@ -77,7 +93,7 @@ defmodule LiveBooruWeb.UploadLive do
   end
 
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
-    {:noreply, cancel_upload(socket, :file, ref)}
+    {:noreply, cancel_upload(socket, :file, ref) |> assign(:autotag_suggestions, [])}
   end
 
   def handle_event("validate", %{"_target" => ["title"], "title" => title}, socket) do

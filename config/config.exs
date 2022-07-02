@@ -10,6 +10,7 @@ import Config
 config :live_booru,
   ecto_repos: [LiveBooru.Repo],
   n_encoders: 2,
+  autotag_url: "http://localhost:5000/evaluate",
   files_root: "/tank/booru/files",
   thumb_root: "/tank/booru/thumb"
 

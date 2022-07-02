@@ -53,7 +53,8 @@ defmodule LiveBooru.MixProject do
       {:size, "~> 0.1.0"},
       {:timex, "~> 3.0"},
       {:earmark, "~> 1.4"},
-      {:arbor, github: "wwww-wwww/arbor", branch: "ecto-3.8.2"}
+      {:arbor, github: "wwww-wwww/arbor", branch: "ecto-3.8.2"},
+      {:httpoison, "~> 1.8"}
     ]
   end
 

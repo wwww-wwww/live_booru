@@ -41,6 +41,8 @@ defmodule LiveBooruWeb.ImageEditLive do
               |> Kernel.--(["Suggestive", "NSFW"])
             )
           )
+          |> assign(:autotag_suggestions, [])
+          |> assign(:autotag_requesting, false)
 
         {:ok, socket}
     end
@@ -200,6 +202,25 @@ defmodule LiveBooruWeb.ImageEditLive do
             end
           end
       end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("autotag", _, socket) do
+    pid = self()
+
+    Task.start(fn ->
+      send(pid, {:autotag_results, LiveBooru.AutoTag.autotag(socket.assigns.image.path)})
+    end)
+
+    {:noreply, assign(socket, :autotag_requesting, true)}
+  end
+
+  def handle_info({:autotag_results, results}, socket) do
+    socket =
+      socket
+      |> assign(:autotag_suggestions, results)
+      |> assign(:autotag_requesting, false)
 
     {:noreply, socket}
   end

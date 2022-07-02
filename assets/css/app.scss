@@ -18,6 +18,7 @@ body {
   --foreground: black;
   --highlight: rgb(218, 255, 218);
   --input-background: white;
+  --green: green;
 
   margin: 0;
   font-family: "Segoe UI", Helvetica, Arial, sans-serif;
@@ -57,33 +58,27 @@ body {
       text-decoration: none;
     }
 
-    li.meta,
-    > a.meta {
+    .meta {
       color: #33ccad;
     }
 
-    li.meta_system,
-    > a.meta_system {
+    .meta_system {
       color: #33ccad;
     }
 
-    li.copyright,
-    > a.copyright {
+    .copyright {
       color: #77ca24;
     }
 
-    li.character,
-    > a.character {
+    .character {
       color: #c5902f;
     }
 
-    li.general,
-    > a.general {
+    .general {
       color: #9d35e6;
     }
 
-    li.artist,
-    > a.artist {
+    .artist {
       color: #e75744;
     }
   }
@@ -200,7 +195,8 @@ nav {
   }
 }
 
-.ImageLive {
+.ImageLive,
+.ImageEditLive {
   .main_image {
     max-width: max(100%, 400px);
     max-height: max(calc(100vh - 12rem), 400px);
@@ -212,7 +208,9 @@ nav {
     max-height: unset;
     cursor: zoom-out;
   }
+}
 
+.ImageLive {
   .content {
     display: flex;
     flex-direction: column;
@@ -559,7 +557,7 @@ button {
 .ImageEditLive {
   .content {
     .suggestions,
-    .tags {
+    .form_tags .tags {
       > button {
         display: flex;
         align-items: center;
@@ -579,6 +577,42 @@ button {
       flex-wrap: wrap;
       gap: 0.5em;
     }
+
+    .section_tags {
+      display: flex;
+      gap: 0.5em;
+
+      > div:first-child {
+        flex: 1;
+      }
+
+      .autotag_tags {
+        > div.selected::before {
+          content: "check";
+          font-family: "Material Icons";
+        }
+
+        > div {
+          padding: 0.1em 0.25em;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
+
+          > span:first-child {
+            flex: 1;
+          }
+
+          > span:last-child {
+            flex: 0;
+          }
+        }
+
+        > div:hover {
+          background-color: var(--highlight);
+        }
+      }
+    }
   }
 }
 
@@ -594,7 +628,7 @@ button {
       gap: 0.5em;
 
       section {
-        border: 1px solid black;
+        border: 1px solid gray;
         border-radius: 0.25rem;
         padding: 1em;
       }
@@ -753,7 +787,7 @@ table {
 
     .changed_tags {
       .added {
-        color: green;
+        color: var(--green);
       }
       .removed {
         color: tomato;

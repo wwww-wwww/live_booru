@@ -3,7 +3,10 @@
 <h1>Editing <%= live_redirect(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
 
 <div>
-  <%= img_tag(Routes.static_path(@socket, "/thumb/#{Path.basename(@image.thumb)}")) %>
+  <input type="checkbox" id="chk_expand" style="display: none;">
+  <label for="chk_expand">
+    <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}"), class: "main_image") %>
+  </label>
 </div>
 
 <form id="form_save" phx-change="validate" phx-submit="save">
@@ -29,25 +32,44 @@
   </div>
 </form>
 
-<h3>Tags</h3>
-<form phx-submit="tag_add" phx-change="tag_q" autocomplete="off">
-  <div class="tags">
-    <%= for tag <- @tags do %>
-    <button form="" value={tag} phx-click="tag_remove"><%= tag %></button>
-    <% end %>
+<div class="section_tags">
+  <div class="form_tags">
+    <h3>Tags</h3>
+    <form phx-submit="tag_add" phx-change="tag_q" autocomplete="off">
+      <div class="tags">
+        <%= for tag <- @tags do %>
+        <button form="" value={tag} phx-click="tag_remove"><%= tag %></button>
+        <% end %>
+      </div>
+
+      <div>
+        <%= tag(:input, id: :tag_input, name: :value, phx_hook: "edit_tab_complete") %>
+        <%= submit("Create Tag") %>
+      </div>
+
+      <div id="suggestions" class="suggestions">
+        <%= for tag <- @suggestions do %>
+        <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
+        <% end %>
+      </div>
+    </form>
   </div>
 
-  <div>
-    <%= tag(:input, id: :tag_input, name: :value, phx_hook: "edit_tab_complete") %>
-    <%= submit("Create Tag") %>
+  <div class="autotag">
+    <h3>Auto Tag</h3>
+    <button phx-click="autotag" disabled={@autotag_requesting}>Request Tags</button>
+    <div class="autotag_tags tags">
+      <%= for {{tag, type}, confidence} <- @autotag_suggestions do %>
+        <div class={[type, (if tag in @tags, do: "selected", else: nil)] |> Enum.filter(&(not is_nil(&1))) |> Enum.join(" ")}
+          phx-value-value={tag}
+          phx-click={if tag in @tags, do: "tag_remove", else: "tag_add"}>
+          <span><%= tag %></span>
+          <span><%= trunc(confidence * 100) %>%</span>
+        </div>
+      <% end %>
+    </div>
   </div>
-
-  <div id="suggestions" class="suggestions">
-    <%= for tag <- @suggestions do %>
-    <button form="" value={tag} phx-click="tag_add"><%= tag %></button>
-    <% end %>
-  </div>
-</form>
+</div>
 
 <div><%= submit("Save", form: "form_save") %></div>
 
