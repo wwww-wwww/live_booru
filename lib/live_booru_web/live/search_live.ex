@@ -36,15 +36,6 @@ defmodule LiveBooruWeb.SearchLive do
     {:ok, socket}
   end
 
-  def handle_event("search", %{"query" => query}, socket) do
-    socket =
-      socket
-      |> put_flash(:search, query)
-      |> push_redirect(to: Routes.live_path(socket, LiveBooruWeb.IndexLive, q: query))
-
-    {:noreply, socket}
-  end
-
   defp remove_quotes(query) do
     case query do
       "\"" <> a ->
@@ -62,6 +53,15 @@ defmodule LiveBooruWeb.SearchLive do
   defp extra_suggestions(query, suggestions) do
     IO.inspect(query)
     (@meta_tags |> Enum.filter(&String.contains?(elem(&1, 0), query))) ++ suggestions
+  end
+
+  def handle_event("search", %{"query" => query}, socket) do
+    socket =
+      socket
+      |> put_flash(:search, query)
+      |> push_redirect(to: Routes.live_path(socket, LiveBooruWeb.IndexLive, q: query))
+
+    {:noreply, socket}
   end
 
   def handle_event("suggest", %{"query" => query}, socket) do

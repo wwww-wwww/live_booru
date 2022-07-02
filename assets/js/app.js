@@ -42,8 +42,8 @@ const hooks = {
       if (!terms) return
 
       let term = terms.at(-1)
-      if (terms[0].startsWith("\"") && !terms[0].endsWith("\"")) {
-        term = terms[0].slice(1) + " " + terms[1]
+      if (terms.length > 1 && terms[0].startsWith("\"") && !terms[0].endsWith("\"")) {
+        term = terms[0] + " " + terms[1]
       }
 
       term = term.slice(0, -1)
@@ -71,6 +71,38 @@ const hooks = {
           this.select(e.target)
         } else if (e.target.parentElement.tagName == "A") {
           this.select(e.target.parentElement)
+        }
+      })
+
+      this.el.addEventListener("keydown", e => {
+        if (e.target.tagName != "A") return
+        if (e.key == "Escape") {
+          search_input.focus()
+          e.preventDefault()
+        } else if (e.key == "ArrowDown") {
+          if (e.target.nextElementSibling) {
+            e.target.nextElementSibling.focus()
+          } else {
+            search_input.focus()
+          }
+          e.preventDefault()
+        } else if (e.key == "ArrowUp") {
+          if (e.target.previousElementSibling) {
+            e.target.previousElementSibling.focus()
+          } else {
+            search_input.focus()
+          }
+          e.preventDefault()
+        }
+      })
+
+      search_input.addEventListener("keydown", e => {
+        if (e.key == "ArrowDown") {
+          this.el.firstElementChild.focus()
+          e.preventDefault()
+        } else if (e.key == "ArrowUp") {
+          this.el.lastElementChild.focus()
+          e.preventDefault()
         }
       })
 

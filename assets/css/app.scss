@@ -16,7 +16,7 @@ body {
 body {
   --background: white;
   --foreground: black;
-  --highlight: rgb(193, 250, 193);
+  --highlight: rgb(218, 255, 218);
   --input-background: white;
 
   margin: 0;
@@ -474,13 +474,14 @@ button {
     display: flex;
     gap: 0.5em;
 
-    > div:focus-within > .suggestions:not(.empty) {
+    > div:focus-within > #search_suggestions:not(.empty) {
       display: flex;
     }
 
-    .suggestions {
+    #search_suggestions {
       display: none;
       flex-direction: column;
+      flex-wrap: nowrap;
       position: absolute;
       top: 100%;
       width: calc(100% - 2px);
@@ -492,6 +493,7 @@ button {
       overflow-y: auto;
 
       > a {
+        outline: none;
         padding: 0.25em 0.5em;
         text-decoration: none;
         display: flex;
@@ -501,7 +503,8 @@ button {
         }
       }
 
-      > a:hover {
+      > a:hover,
+      > a:focus {
         background-color: var(--highlight);
       }
     }
@@ -554,26 +557,28 @@ button {
 
 .UploadLive,
 .ImageEditLive {
-  .suggestions,
-  .tags {
-    > button {
+  .content {
+    .suggestions,
+    .tags {
+      > button {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        padding: 0.5em;
+        cursor: pointer;
+        border: none;
+        border-radius: 100vh;
+        background-color: rgb(230, 230, 230);
+      }
+
+      > button:hover {
+        background-color: rgb(240, 240, 240);
+      }
+
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 0.5em;
-      padding: 0.5em;
-      cursor: pointer;
-      border: none;
-      border-radius: 100vh;
-      background-color: rgb(230, 230, 230);
     }
-
-    > button:hover {
-      background-color: rgb(240, 240, 240);
-    }
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
   }
 }
 
