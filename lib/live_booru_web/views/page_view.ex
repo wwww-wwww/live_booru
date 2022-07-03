@@ -36,9 +36,9 @@ defmodule LiveBooruWeb.PageView do
           String.replace(
             acc,
             full,
-            safe_to_string(
-              live_patch(tag.name, to: Routes.live_path(socket, LiveBooruWeb.TagLive, id))
-            )
+            live_patch(tag.name, to: Routes.live_path(socket, LiveBooruWeb.TagLive, id))
+            |> Phoenix.HTML.Safe.to_iodata()
+            |> IO.iodata_to_binary()
           )
       end
     end)
@@ -52,9 +52,9 @@ defmodule LiveBooruWeb.PageView do
           String.replace(
             acc,
             full,
-            safe_to_string(
-              live_patch(image.name, to: Routes.live_path(socket, LiveBooruWeb.ImageLive, id))
-            )
+            live_patch(image.name, to: Routes.live_path(socket, LiveBooruWeb.ImageLive, id))
+            |> Phoenix.HTML.Safe.to_iodata()
+            |> IO.iodata_to_binary()
           )
       end
     end)
@@ -68,11 +68,11 @@ defmodule LiveBooruWeb.PageView do
           String.replace(
             acc,
             full,
-            safe_to_string(
-              live_patch("##{id}",
-                to: Routes.live_path(socket, LiveBooruWeb.ImageLive, image_id) <> "#comment_#{id}"
-              )
+            live_patch("##{id}",
+              to: Routes.live_path(socket, LiveBooruWeb.ImageLive, image_id) <> "#comment_#{id}"
             )
+            |> Phoenix.HTML.Safe.to_iodata()
+            |> IO.iodata_to_binary()
           )
       end
     end)
