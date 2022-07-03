@@ -563,7 +563,8 @@ button {
     align-items: center;
     gap: 0.5em;
 
-    > :not(div) {
+    > .top {
+      flex-direction: column;
       width: 1000px;
       max-width: 100%;
     }
