@@ -262,7 +262,7 @@ defmodule LiveBooru.Repo do
     filter(query, Keyword.merge(opts, order: order))
   end
 
-  def build_search_tags(query) do
+  def build_search_tags(query, category \\ false) do
     query_aliases =
       from t in Tag,
         where: ilike(t.name, ^"%#{query}%") and not is_nil(t.tag_id)
@@ -273,10 +273,16 @@ defmodule LiveBooru.Repo do
         on: t.id == a.tag_id,
         select: t.id
 
-    from t in Tag,
-      where:
-        ((ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)) and
-          t.type != :category
+    if category do
+      from t in Tag,
+        where:
+          (ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)
+    else
+      from t in Tag,
+        where:
+          ((ilike(t.name, ^"%#{query}%") and is_nil(t.tag_id)) or t.id in subquery(aliases_tags)) and
+            t.type != :category
+    end
   end
 
   def get_tag(name) do

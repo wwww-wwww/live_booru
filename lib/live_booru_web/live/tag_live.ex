@@ -206,7 +206,7 @@ defmodule LiveBooruWeb.TagLive do
     socket =
       if String.length(q) > 0 do
         query =
-          from t in Repo.build_search_tags(q),
+          from t in Repo.build_search_tags(q, true),
             where: t.type != :meta_system
 
         suggestions =
