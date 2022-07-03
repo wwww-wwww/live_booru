@@ -152,37 +152,38 @@ defmodule LiveBooru.Repo do
   def search(query, opts) do
     {inc, exc, extra, order} = Repo.parse_terms(query)
 
+    query_exclude_aliases =
+      from t in Tag,
+        where: not is_nil(t.tag_id) and fragment("lower(?)", t.name) in ^exc,
+        select: t.tag_id
+
+    query_exclude =
+      from t in Tag,
+        join: it in LiveBooru.ImagesTags,
+        on: it.tag_id == t.id,
+        where: fragment("lower(?)", t.name) in ^exc or t.id in subquery(query_exclude_aliases),
+        select: it.image_id,
+        group_by: it.image_id
+
     query =
-      case {inc, exc} do
-        {[], exc} ->
-          query_exclude =
+      case inc do
+        [] ->
+          from i in Image, where: i.id not in subquery(query_exclude)
+
+        inc ->
+          query_aliases =
             from t in Tag,
-              join: it in LiveBooru.ImagesTags,
-              on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^exc,
-              select: it.image_id,
-              group_by: it.image_id
+              where: not is_nil(t.tag_id) and fragment("lower(?)", t.name) in ^inc,
+              select: t.tag_id
 
-          from i in Image,
-            where: i.id not in subquery(query_exclude)
-
-        {inc, exc} ->
           query =
             from t in Tag,
               join: it in LiveBooru.ImagesTags,
               on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^inc,
+              where: fragment("lower(?)", t.name) in ^inc or t.id in subquery(query_aliases),
               select: it.image_id,
               group_by: it.image_id,
               having: count() == ^length(inc)
-
-          query_exclude =
-            from t in Tag,
-              join: it in LiveBooru.ImagesTags,
-              on: it.tag_id == t.id,
-              where: fragment("lower(?)", t.name) in ^exc,
-              select: it.image_id,
-              group_by: it.image_id
 
           from i in Image,
             join: s in subquery(query),
