@@ -51,7 +51,6 @@ defmodule LiveBooruWeb.SearchLive do
   end
 
   defp extra_suggestions(query, suggestions) do
-    IO.inspect(query)
     (@meta_tags |> Enum.filter(&String.contains?(elem(&1, 0), query))) ++ suggestions
   end
 
