@@ -10,6 +10,9 @@
   <li>Supported upload formats: JPEG XL, JPEG, PNG, APNG, GIF</li>
 </ul>
 
+<div> <%# inner %>
+
+<div class="left">
 <form id="form_submit" phx-change="validate" phx-submit="submit">
   <h3>File</h3>
   <section phx-drop-target={@uploads.file.ref}>
@@ -25,12 +28,6 @@
       <%= for entry <- @uploads.file.entries do %>
       <article class="upload-entry">
 
-        <figure>
-          <%# Phoenix.LiveView.Helpers.live_img_preview/2 renders a client-side preview %>
-          <%= live_img_preview entry %>
-          <figcaption><%= entry.client_name %></figcaption>
-        </figure>
-
         <div>
           <%# entry.progress will update automatically for in-flight entries %>
           <progress value={entry.progress} max="100"> <%= entry.progress %>% </progress>
@@ -43,38 +40,44 @@
           <p class="alert alert-danger"><%= inspect(err) %></p>
         <% end %>
 
+        <figure>
+          <%# Phoenix.LiveView.Helpers.live_img_preview/2 renders a client-side preview %>
+          <%= live_img_preview entry %>
+          <figcaption><%= entry.client_name %></figcaption>
+        </figure>
+
       </article>
       <% end %>
     </div>
 
   </section>
-
-  <h3>Title</h3>
-  <%= tag(:input, name: :title, value: @title) %>
-
-  <h3>Source</h3>
-  <%= tag(:input, name: :source, value: @source) %>
-
-  <h3>Rating</h3>
-  <div>
-    <label>
-      <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw") %>
-      NSFW
-    </label>
-
-    <label>
-      <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive") %>
-      Suggestive
-    </label>
-
-    <label>
-      <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe") %>
-      Safe
-    </label>
-  </div>
-
 </form>
+</div> <%# left %>
 
+<div> <%# right %>
+<h3>Title</h3>
+<%= tag(:input, name: :title, value: @title, form: "form_submit") %>
+
+<h3>Source</h3>
+<%= tag(:input, name: :source, value: @source, form: "form_submit") %>
+
+<h3>Rating</h3>
+<div>
+  <label>
+    <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw", form: "form_submit") %>
+    NSFW
+  </label>
+
+  <label>
+    <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive", form: "form_submit") %>
+    Suggestive
+  </label>
+
+  <label>
+    <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe", form: "form_submit") %>
+    Safe
+  </label>
+</div>
 
 <div class="section_tags">
   <div class="form_tags">
@@ -115,5 +118,7 @@
 </div>
 
 <div><%= submit("Submit", form: "form_submit") %></div>
+</div> <%# right %>
 
+</div> <%# inner %>
 </div> <%# content %>

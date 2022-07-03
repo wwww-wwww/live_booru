@@ -2,33 +2,38 @@
 
 <h1>Editing <%= live_redirect(@image.id, to: Routes.live_path(@socket, LiveBooruWeb.ImageLive, @image.id)) %></h1>
 
+<div> <%# inner %>
+
+<div class="left">
 <div>
   <input type="checkbox" id="chk_expand" style="display: none;">
   <label for="chk_expand">
     <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}"), class: "main_image") %>
   </label>
 </div>
+</div>
 
+<div> <%# right %>
 <form id="form_save" phx-change="validate" phx-submit="save">
   <h3>Source</h3>
   <%= tag(:input, name: :source, value: @source) %>
 
   <h3>Rating</h3>
   <div>
-  <label>
-    <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw") %>
-    NSFW
-  </label>
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "nsfw", checked: @rating == "nsfw") %>
+      NSFW
+    </label>
 
-  <label>
-    <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive") %>
-    Suggestive
-  </label>
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "suggestive", checked: @rating == "suggestive") %>
+      Suggestive
+    </label>
 
-  <label>
-    <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe") %>
-    Safe
-  </label>
+    <label>
+      <%= tag(:input, name: :rating, type: "radio", value: "safe", checked: @rating == "safe") %>
+      Safe
+    </label>
   </div>
 </form>
 
@@ -72,5 +77,7 @@
 </div>
 
 <div><%= submit("Save", form: "form_save") %></div>
+</div> <%# right %>
 
-</div>
+</div> <%# inner %>
+</div> <%# content %>
