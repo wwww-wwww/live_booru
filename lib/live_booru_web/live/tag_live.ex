@@ -92,6 +92,10 @@ defmodule LiveBooruWeb.TagLive do
                     |> Repo.insert()
                   end
 
+                  if attrs[:tag_id] do
+                    LiveBooru.aliases()
+                  end
+
                   socket
                   |> assign(:tag, Repo.preload(new_tag, [:tag, :aliases, :children, :parent]))
                   |> assign(:editing, false)

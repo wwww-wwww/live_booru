@@ -1,5 +1,7 @@
 defmodule LiveBooru do
-  alias LiveBooru.{Repo, Tag, Image, ImageChange, AutoTag}
+  alias LiveBooru.{Repo, Tag, Image, ImageChange, ImagesTags, AutoTag}
+
+  import Ecto.Query, only: [from: 2]
 
   def files_root(), do: Application.get_env(:live_booru, :files_root)
   def thumb_root(), do: Application.get_env(:live_booru, :thumb_root)
@@ -32,6 +34,31 @@ defmodule LiveBooru do
     Repo.all(Image)
     |> Enum.each(fn image ->
       Ecto.Changeset.change(image, %{info: LiveBooru.Jxl.info(image.path)})
+      |> Repo.update()
+    end)
+  end
+
+  def aliases() do
+    q =
+      from(it in ImagesTags,
+        join: t in Tag,
+        on: t.id == it.tag_id,
+        group_by: it.image_id,
+        select: it.image_id,
+        where: not is_nil(t.tag_id)
+      )
+
+    from(i in Image, join: it in subquery(q), on: i.id == it.image_id)
+    |> Repo.all()
+    |> Repo.preload(tags: [:tag])
+    |> Enum.each(fn image ->
+      tags =
+        image.tags
+        |> Enum.map(&(&1.tag || &1))
+        |> Enum.uniq_by(& &1.id)
+
+      Ecto.Changeset.change(image)
+      |> Ecto.Changeset.put_assoc(:tags, tags)
       |> Repo.update()
     end)
   end
