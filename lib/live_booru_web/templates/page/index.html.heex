@@ -14,18 +14,28 @@
 <div class="content">
 
 <% current_page = floor(@offset / @search_metadata.limit) %>
+<% total_pages = @search_metadata.pages %>
+<% pages = ([1] ++ (1..total_pages
+    |> Enum.drop(max(min(current_page - 2, total_pages - 5), 0))
+    |> Enum.take(5)) ++ [total_pages]
+  )
+  |> Enum.uniq() %>
 
 <div class="pages">
-<%= for i <- 1..@search_metadata.pages do %>
-  <%= if i - 1 == current_page do %>
-    <span><%= i %></span>
+<%= for i <- 1..length(pages) do %>
+  <% page = Enum.at(pages, i - 1)  %>
+  <%= if page - 1 == current_page do %>
+    <span><%= page %></span>
   <% else %>
-    <%= live_patch(i,
+    <%= live_patch(page,
       to: Routes.live_path(
         @socket,
         LiveBooruWeb.IndexLive,
         q: @search,
-        offset: (i - 1) * @search_metadata.limit)) %>
+        offset: (page - 1) * @search_metadata.limit)) %>
+  <% end %>
+  <%= if not is_nil(Enum.at(pages, i)) and Enum.at(pages, i) - 1 != page do %>
+    <span>...</span>
   <% end %>
 <% end %>
 </div>
@@ -58,16 +68,20 @@
 </div>
 
 <div class="pages">
-<%= for i <- 1..@search_metadata.pages do %>
-  <%= if i - 1 == current_page do %>
-    <span><%= i %></span>
+<%= for i <- 1..length(pages) do %>
+  <% page = Enum.at(pages, i - 1)  %>
+  <%= if page - 1 == current_page do %>
+    <span><%= page %></span>
   <% else %>
-    <%= live_patch(i,
+    <%= live_patch(page,
       to: Routes.live_path(
         @socket,
         LiveBooruWeb.IndexLive,
         q: @search,
-        offset: (i - 1) * @search_metadata.limit)) %>
+        offset: (page - 1) * @search_metadata.limit)) %>
+  <% end %>
+  <%= if not is_nil(Enum.at(pages, i)) and Enum.at(pages, i) - 1 != page do %>
+    <span>...</span>
   <% end %>
 <% end %>
 </div>
