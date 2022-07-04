@@ -128,7 +128,7 @@ nav {
 
 .IndexLive {
   main {
-    overflow-x: scroll;
+    overflow-x: auto;
 
     > div {
       min-width: 700px;
@@ -139,6 +139,7 @@ nav {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
+    justify-content: space-evenly;
 
     > div {
       position: relative;
@@ -724,6 +725,7 @@ main {
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
 
   > .middle {
     display: flex;
