@@ -54,7 +54,7 @@ defmodule LiveBooruWeb.SearchLive do
     (@meta_tags |> Enum.filter(&String.contains?(elem(&1, 0), query))) ++ suggestions
   end
 
-  def handle_event("search", %{"query" => query}, socket) do
+  def handle_event("search", %{"q" => query}, socket) do
     socket =
       socket
       |> put_flash(:search, query)
@@ -63,7 +63,7 @@ defmodule LiveBooruWeb.SearchLive do
     {:noreply, socket}
   end
 
-  def handle_event("suggest", %{"query" => query}, socket) do
+  def handle_event("suggest", %{"q" => query}, socket) do
     terms = Repo.separate_terms(query <> ".")
 
     socket =

@@ -2,7 +2,7 @@
 
 <form phx-submit="search" phx-target={assigns[:myself]} phx-change="suggest">
   <div>
-    <%= tag(:input, id: "search_input", name: :query, autocomplete: "off", value: @q) %>
+    <%= tag(:input, id: "search_input", name: :q, autocomplete: "off", value: @q) %>
     <div id="search_suggestions" class="tags" phx-hook="search_suggestions" tabindex="-1">
       <%= if not is_nil(assigns[:suggestions]) do %>
         <%= for {suggestion, type, count} <- @suggestions do %>
