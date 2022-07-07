@@ -1,0 +1,21 @@
+html {
+  font-size: 1rem;
+}
+
+.sidebar {
+  li {
+    font-size: 1.0rem;
+  }
+}
+
+body {
+  .taglist {
+    li > *:not(:last-child) {
+      margin-right: 0.25em;
+    }
+
+    li:not(:last-child) {
+      margin-bottom: 0.5em;
+    }
+  }
+}

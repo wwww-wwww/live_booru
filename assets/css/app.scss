@@ -485,7 +485,7 @@ button {
       top: 100%;
       width: calc(100% - 2px);
       background-color: var(--input-background);
-      font-size: 0.9em;
+      font-size: 0.9rem;
       z-index: 2;
       border: 1px solid gray;
       max-height: min(calc(100vh - 6em), 20em);
@@ -885,4 +885,8 @@ table {
       content: " (Category)";
     }
   }
+}
+
+@media screen and (max-device-width: 480px) and (orientation: portrait) {
+  @import "mobile.scss";
 }
