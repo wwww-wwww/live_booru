@@ -1,16 +1,6 @@
 import os, io, argparse
 from PIL import Image, ImageChops
 
-
-def is_gray(im):
-  rgb = im.split()
-  if ImageChops.difference(rgb[0], rgb[1]).getextrema()[1] != 0:
-    return False
-  if ImageChops.difference(rgb[0], rgb[2]).getextrema()[1] != 0:
-    return False
-  return True
-
-
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("input")
