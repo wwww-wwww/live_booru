@@ -2,15 +2,16 @@ a {
   color: skyblue;
 }
 
-> div {
+& {
   --background: rgb(30, 30, 30);
   --foreground: gainsboro;
   --input-background: rgb(36, 36, 36);
   --highlight: rgb(56, 56, 56);
   --green: mediumseagreen;
+  --noise: url(#noise_dark);
+}
 
-  background-color: rgb(30, 30, 30);
-
+> div {
   nav {
     a {
       color: gainsboro;

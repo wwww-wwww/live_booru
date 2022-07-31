@@ -19,9 +19,12 @@ body {
   --highlight: rgb(218, 255, 218);
   --input-background: white;
   --green: green;
+  --noise: url(#noise);
 
   margin: 0;
   font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+
+  background: var(--background);
 
   > div {
     height: 100%;
@@ -29,6 +32,18 @@ body {
     flex-direction: column;
     overflow: auto;
     color: var(--foreground);
+  }
+
+  > div::before {
+    position: fixed;
+    left: 0;
+    top: 0;
+    content: "";
+    width: 100vw;
+    height: 100vh;
+    filter: var(--noise);
+    z-index: -1;
+    transform: scale(1);
   }
 
   a {
