@@ -7,7 +7,7 @@ defmodule LiveBooru.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -40,10 +40,10 @@ defmodule LiveBooru.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.17.9"},
+      {:phoenix_live_view, "~> 0.17.10"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.6"},
-      {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.18"},
@@ -53,7 +53,7 @@ defmodule LiveBooru.MixProject do
       {:size, "~> 0.1.0"},
       {:timex, "~> 3.0"},
       {:earmark, "~> 1.4"},
-      {:arbor, github: "wwww-wwww/arbor", branch: "ecto-3.8.2"},
+      {:arbor, "~> 1.1.0"},
       {:httpoison, "~> 1.8"}
     ]
   end
