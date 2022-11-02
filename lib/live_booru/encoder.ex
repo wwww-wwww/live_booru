@@ -5,7 +5,7 @@ defmodule LiveBooru.Encoder do
 
   alias LiveBooru.{WorkerManager, EncoderManager, Uploader, Repo, Upload, Image, Tag, Collection}
 
-  @cjxl_args ["-q", "100", "-e", "9", "-E", "3", "-I", "1"]
+  @cjxl_args ["-q", "100", "-e", "9", "-E", "3", "-I", "100"]
 
   defstruct id: nil, active: false
 
@@ -49,7 +49,7 @@ defmodule LiveBooru.Encoder do
 
   def best_encode(format, path_in, path_out) do
     [[path_in, path_in <> ".jxl", []]]
-    |> Kernel.++(if format == :jpeg, do: [[path_in, path_in <> ".j.jxl", ["-j"]]], else: [])
+    |> Kernel.++(if format == :jpeg, do: [[path_in, path_in <> ".j.jxl", ["-j", "0"]]], else: [])
     |> Enum.reduce_while([], fn args, acc ->
       case apply(__MODULE__, :encode, args) do
         {:ok, resp} -> {:cont, acc ++ [resp]}
