@@ -88,7 +88,7 @@ defmodule LiveBooruWeb.PageView do
 
   def tag_link(socket, tag, count, true) do
     [
-      live_patch("?", to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id)),
+      live_redirect("?", to: Routes.live_path(socket, LiveBooruWeb.TagLive, tag.id)),
       live_patch(tag.name,
         to: Routes.live_path(socket, LiveBooruWeb.IndexLive, q: quote_tag(tag))
       ),
