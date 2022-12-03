@@ -132,4 +132,28 @@ defmodule LiveBooru do
       end
     end)
   end
+
+  def get_not_params(params) do
+    Repo.all(Image)
+    |> Enum.filter(&(&1.encoder_params != params))
+  end
+
+  def reencode_jpgs() do
+    get_not_params("q 100 -e 9 -E 3 -I 100")
+    |> Enum.filter(&(&1.info |> String.contains?("JPEG bitstream reconstruction")))
+    |> Enum.each(fn image ->
+      System.cmd("djxl", [image.path, image.path <> ".jpg"], stderr_to_stdout: true)
+      |> case do
+        {output, 0} ->
+          if String.contains?(output, "Reconstructed to JPEG") do
+            IO.inspect(image.filesize)
+            LiveBooru.Encoder.encode(image.path <> ".jpg", "new.jxl", [])
+            |> IO.inspect()
+          end
+
+        _ ->
+          nil
+      end
+    end)
+  end
 end
