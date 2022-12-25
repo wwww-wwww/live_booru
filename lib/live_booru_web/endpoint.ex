@@ -20,7 +20,7 @@ defmodule LiveBooruWeb.Endpoint do
     at: "/",
     from: :live_booru,
     gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    only: ~w(assets fonts images jxl favicon.ico robots.txt)
 
   plug Plug.Static,
     at: "/file",

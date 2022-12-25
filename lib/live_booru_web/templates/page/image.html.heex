@@ -136,7 +136,7 @@
 <div>
   <input type="checkbox" id="chk_expand" style="display: none;">
   <label for="chk_expand">
-    <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}"), class: "main_image") %>
+    <%= img_tag(Routes.static_path(@socket, "/file/#{Path.basename(@image.path)}"), class: "main_image", height: @image.height) %>
   </label>
 </div>
 
