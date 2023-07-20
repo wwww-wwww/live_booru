@@ -22,6 +22,13 @@ defmodule LiveBooru do
     Repo.all(Image) |> Enum.each(&Repo.delete(&1))
   end
 
+  def delete_image(id) do
+    image = LiveBooru.Repo.get(LiveBooru.Image, id)
+    File.rm(image.path)
+    File.rm(image.thumb)
+    LiveBooru.Repo.delete(image)
+  end
+
   def test() do
     Repo.insert(Tag.new("test", :general))
     |> case do
@@ -147,6 +154,7 @@ defmodule LiveBooru do
         {output, 0} ->
           if String.contains?(output, "Reconstructed to JPEG") do
             IO.inspect(image.filesize)
+
             LiveBooru.Encoder.encode(image.path <> ".jpg", "new.jxl", [])
             |> IO.inspect()
           end
